@@ -41,11 +41,13 @@ namespace MultiSupplierMTPlugin.Helpers
         {
             lock (_initLock)
             {
+                _allServices.Clear();
+
                 foreach (var oldName in _lastCustomUniqueNames.Keys)
                 {
                     _allNames.TryRemove(oldName, out _);
                     _allInfos.TryRemove(oldName, out _);
-                    _allServices.TryRemove(oldName, out _);
+                    //_allServices.TryRemove(oldName, out _);
                 }
                 _lastCustomUniqueNames.Clear();
 

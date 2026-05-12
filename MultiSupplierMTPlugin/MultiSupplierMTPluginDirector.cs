@@ -17,7 +17,7 @@ namespace MultiSupplierMTPlugin
 
         private MultiSupplierMTOptions _mtOptions;
 
-        private static readonly object _lock = new object();
+        //private static readonly object _lock = new object();
 
         public MultiSupplierMTPluginDirector()
         {
@@ -196,38 +196,41 @@ namespace MultiSupplierMTPlugin
 
         private MultiSupplierMTOptions GetOrInitializeOptions(PluginSettings pluginSettings)
         {
-            if (_mtOptions != null)
-                return _mtOptions;
+            //if (_mtOptions != null)
+            //    return _mtOptions;
 
-            lock (_lock)
-            {
-                if (_mtOptions != null)
-                    return _mtOptions;
+            //lock (_lock)
+            //{
+            //   if (_mtOptions != null)
+            //        return _mtOptions;
 
-                var mtOptions = new MultiSupplierMTOptions(pluginSettings);
+            // TODO 允许重复初始化
 
-                var general = mtOptions.GeneralSettings;
+            var mtOptions = new MultiSupplierMTOptions(pluginSettings);
 
-                OptionsHelper.Init(mtOptions);
+            var general = mtOptions.GeneralSettings;
 
-                LocalizedHelper.Init(general.UILanguage);
+            OptionsHelper.Init(mtOptions);
 
-                LoggingHelper.Init(Path.Combine(general.DataDir, "Log"), _dllFileName, general.EnableStatsAndLog, general.LogLevel, general.LogRetentionDays);
+            LocalizedHelper.Init(general.UILanguage);
 
-                ServiceHelper.Init(general.CustomOpenAICompatibleServiceInfos);
+            LoggingHelper.Init(Path.Combine(general.DataDir, "Log"), _dllFileName, general.EnableStatsAndLog, general.LogLevel, general.LogRetentionDays);
 
-                DatabaseHelper.Init(Path.Combine(general.DataDir, "Cache", "Translation"), _dllFileName);
+            ServiceHelper.Init(general.CustomOpenAICompatibleServiceInfos);
 
-                CacheHelper.Init(DatabaseHelper.LiteDatebase);
+            DatabaseHelper.Init(Path.Combine(general.DataDir, "Cache", "Translation"), _dllFileName);
 
-                StatsHelper.Init(DatabaseHelper.LiteDatebase);
+            CacheHelper.Init(DatabaseHelper.LiteDatebase);
 
-                ContextHelper.Init(_dllFileName);
+            StatsHelper.Init(DatabaseHelper.LiteDatebase);
 
-                _mtOptions = mtOptions;
+            ContextHelper.Init(_dllFileName);
 
-                return mtOptions;
-            }
+            _mtOptions = mtOptions;
+
+            return mtOptions;
+            
+            //}
         }
     }
 }
