@@ -119,7 +119,7 @@ namespace MultiSupplierMTPlugin.ProvidersCommon.Forms.LLM
 
         private void buttonGlossarySelect_Click(object sender, EventArgs e)
         {
-            openFileDialog.Filter = "All Supported Formats|*.txt;*.cvs;";
+            openFileDialog.Filter = "All Supported Formats|*.txt;*.csv;";
 
             openFileDialog.FileName = "";
 
