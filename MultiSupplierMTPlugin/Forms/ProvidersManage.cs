@@ -48,17 +48,19 @@ namespace MultiSupplierMTPlugin.Forms
         {
             Text = LLH.G(LLK.Form);
 
-            labelDisableSrarch.Text = LLH.G(LLK.LabelDisableSrarch);
-            labelEnableSearch.Text = LLH.G(LLK.LabelEnableSearch);
+            labelSearch.Text = LLH.G(LLK.LabelSearch);
 
             linkLabelReset.Text = LLH.G(LLK.LinkLabelReset);
             toolTip.SetToolTip(linkLabelReset, LLH.G(LLK.LinkLabelResetTip));
 
             buttonDisable.Text = LLH.G(LLK.ButtonDisable);
-            buttonEnable.Text = LLH.G(LLK.ButtonEnable);
+            toolTip.SetToolTip(buttonDisable, LLH.G(LLK.ButtonDisableTip));
 
-            labelDisabledList.Text = LLH.G(LLK.LabelDisabledList);
-            labelEnabledList.Text = LLH.G(LLK.labelDisabledList);
+            buttonEnable.Text = LLH.G(LLK.ButtonEnable);
+            toolTip.SetToolTip(buttonEnable, LLH.G(LLK.ButtonEnableTip));
+
+            labelDisabledProviders.Text = LLH.G(LLK.LabelDisabledProviders);
+            labelEnabledProviders.Text = LLH.G(LLK.LabelEnabledProviders);
 
             labelNoDisableTip.Text = LLH.G(LLK.LabelNoDisableTip);
 
@@ -249,27 +251,16 @@ namespace MultiSupplierMTPlugin.Forms
             MoveSelectedProviders(dataGridViewEnable, dataGridViewDisable, _enableDataTable, _disableDataTable, false);
         }
 
-        private void textBoxSearchEnabled_TextChanged(object sender, EventArgs e)
+        private void textBoxSearch_TextChanged(object sender, EventArgs e)
         {
             try
             {
-                ApplyFilter(textBoxEnableSearch.Text, _enableDataTable);
+                ApplyFilter(textBoxSearch.Text, _enableDataTable);
+                ApplyFilter(textBoxSearch.Text, _disableDataTable);
             }
             catch
             {
-                textBoxEnableSearch.Text = "";
-            }
-        }
-
-        private void textBoxSearchDisabled_TextChanged(object sender, EventArgs e)
-        {
-            try
-            {
-                ApplyFilter(textBoxDisableSearch.Text, _disableDataTable);
-            }
-            catch
-            {
-                textBoxDisableSearch.Text = "";
+                textBoxSearch.Text = "";
             }
         }
 
@@ -327,29 +318,32 @@ namespace MultiSupplierMTPlugin.Forms
         [LocalizedValue("ed4a5a1f-1ca2-484e-9c3b-908edbb4ed49", "Providers Manage", "提供商管理")]
         public static ProvidersManageLocalizedKey Form { get; private set; }
 
-        [LocalizedValue("9ee486f6-174d-4899-b7fc-855565f0c892", "Srarch: ", "搜索 :")]
-        public static ProvidersManageLocalizedKey LabelDisableSrarch { get; private set; }
-
-        [LocalizedValue("b5831544-e5dc-4fff-97dc-d3422d83524e", "Srarch: ", "搜索：")]
-        public static ProvidersManageLocalizedKey LabelEnableSearch { get; private set; }
+        [LocalizedValue("9ee486f6-174d-4899-b7fc-855565f0c892", "Search: ", "搜索 :")]
+        public static ProvidersManageLocalizedKey LabelSearch { get; private set; }
 
         [LocalizedValue("ced4be43-038e-4f29-8353-e3b4c18276dd", "↻", "↻")]
         public static ProvidersManageLocalizedKey LinkLabelReset { get; private set; }
 
-        [LocalizedValue("fd555cd4-f439-4de4-a924-00c15fb59e4f", "Reset", "重置")]
+        [LocalizedValue("fd555cd4-f439-4de4-a924-00c15fb59e4f", "Reset this modification", "重置本次修改")]
         public static ProvidersManageLocalizedKey LinkLabelResetTip { get; private set; }
 
         [LocalizedValue("f48efc1f-a91e-4130-8106-bfec7099a0a4", "<-", "<-")]
         public static ProvidersManageLocalizedKey ButtonDisable { get; private set; }
 
+        [LocalizedValue("d48aba12-cb47-4953-a190-01f767622ef7", "Move the selected item(s) on the [Right] to the [Left]", "将【右边】选中项移动到【左边】")]
+        public static ProvidersManageLocalizedKey ButtonDisableTip { get; private set; }
+
         [LocalizedValue("dde7d53b-bb65-4cab-b12a-dbd58270f5a8", "->", "->")]
         public static ProvidersManageLocalizedKey ButtonEnable { get; private set; }
 
-        [LocalizedValue("34b55a8d-4358-41c0-8173-e0052af9c855", "Disabled List", "已禁用列表")]
-        public static ProvidersManageLocalizedKey LabelDisabledList { get; private set; }
+        [LocalizedValue("190c9bba-4adc-4a78-9366-82840043957f", "Move the selected item(s) on the [Left] to the [Right]", "将【左边】选中项移动到【右边】")]
+        public static ProvidersManageLocalizedKey ButtonEnableTip { get; private set; }
 
-        [LocalizedValue("e2f3b06e-e5c1-435a-9781-b2905f0ed735", "Enabled List", "已启用列表")]
-        public static ProvidersManageLocalizedKey labelDisabledList { get; private set; }
+        [LocalizedValue("34b55a8d-4358-41c0-8173-e0052af9c855", "Disabled Providers", "已禁用的提供商")]
+        public static ProvidersManageLocalizedKey LabelDisabledProviders { get; private set; }
+
+        [LocalizedValue("e2f3b06e-e5c1-435a-9781-b2905f0ed735", "Enabled Providers", "已启用的提供商")]
+        public static ProvidersManageLocalizedKey LabelEnabledProviders { get; private set; }
 
         [LocalizedValue("5b219bf4-80d6-419c-8963-470147257d65", "Can not disable the provider in used !", "无法禁用正在使用的提供商！")]
         public static ProvidersManageLocalizedKey LabelNoDisableTip { get; private set; }

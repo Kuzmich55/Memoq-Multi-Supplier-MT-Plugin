@@ -39,7 +39,7 @@
             this.labelSystemPrompt = new System.Windows.Forms.Label();
             this.buttonAdd = new System.Windows.Forms.Button();
             this.buttonDelete = new System.Windows.Forms.Button();
-            this.buttonRename = new System.Windows.Forms.Button();
+            this.textBoxName = new System.Windows.Forms.TextBox();
             this.textBoxTemplate = new System.Windows.Forms.TextBox();
             this.toolTip = new System.Windows.Forms.ToolTip(this.components);
             this.textBoxBathTranslateUserPrompt = new System.Windows.Forms.TextBox();
@@ -57,7 +57,7 @@
             // 
             this.buttonCancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.buttonCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this.buttonCancel.Location = new System.Drawing.Point(424, 638);
+            this.buttonCancel.Location = new System.Drawing.Point(424, 679);
             this.buttonCancel.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             this.buttonCancel.Name = "buttonCancel";
             this.buttonCancel.Size = new System.Drawing.Size(103, 27);
@@ -69,7 +69,7 @@
             // 
             this.buttonOK.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.buttonOK.DialogResult = System.Windows.Forms.DialogResult.OK;
-            this.buttonOK.Location = new System.Drawing.Point(315, 638);
+            this.buttonOK.Location = new System.Drawing.Point(315, 679);
             this.buttonOK.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             this.buttonOK.Name = "buttonOK";
             this.buttonOK.Size = new System.Drawing.Size(100, 27);
@@ -151,7 +151,7 @@
             // 
             // buttonDelete
             // 
-            this.buttonDelete.Location = new System.Drawing.Point(297, 10);
+            this.buttonDelete.Location = new System.Drawing.Point(440, 10);
             this.buttonDelete.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             this.buttonDelete.Name = "buttonDelete";
             this.buttonDelete.Size = new System.Drawing.Size(74, 27);
@@ -160,24 +160,13 @@
             this.buttonDelete.UseVisualStyleBackColor = true;
             this.buttonDelete.Click += new System.EventHandler(this.buttonDelete_Click);
             // 
-            // buttonRename
+            // textBoxName
             // 
-            this.buttonRename.Location = new System.Drawing.Point(440, 10);
-            this.buttonRename.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            this.buttonRename.Name = "buttonRename";
-            this.buttonRename.Size = new System.Drawing.Size(74, 27);
-            this.buttonRename.TabIndex = 3;
-            this.buttonRename.Text = "Rename";
-            this.buttonRename.UseVisualStyleBackColor = true;
-            this.buttonRename.Click += new System.EventHandler(this.buttonRename_Click);
-            // 
-            // textBoxTemplate
-            // 
-            this.textBoxTemplate.Location = new System.Drawing.Point(152, 54);
-            this.textBoxTemplate.Name = "textBoxTemplate";
-            this.textBoxTemplate.Size = new System.Drawing.Size(362, 25);
-            this.textBoxTemplate.TabIndex = 6;
-            this.textBoxTemplate.Visible = false;
+            this.textBoxName.Location = new System.Drawing.Point(152, 97);
+            this.textBoxName.Name = "textBoxName";
+            this.textBoxName.Size = new System.Drawing.Size(362, 25);
+            this.textBoxName.TabIndex = 6;
+            this.textBoxName.LostFocus += new System.EventHandler(this.textBoxName_LostFocus);
             // 
             // toolTip
             // 
@@ -252,16 +241,12 @@
             // 
             // groupBoxBathTranslate
             // 
-            this.groupBoxBathTranslate.Controls.Add(this.textBoxBathTranslateSystemPrompt);
-            this.groupBoxBathTranslate.Controls.Add(this.labelBathTranslateSystemPrompt);
-            this.groupBoxBathTranslate.Controls.Add(this.textBoxBathTranslateUserPrompt);
-            this.groupBoxBathTranslate.Controls.Add(this.labelBathTranslateUserPrompt);
-            this.groupBoxBathTranslate.Location = new System.Drawing.Point(10, 369);
-            this.groupBoxBathTranslate.Name = "groupBoxBathTranslate";
-            this.groupBoxBathTranslate.Size = new System.Drawing.Size(516, 253);
-            this.groupBoxBathTranslate.TabIndex = 33;
-            this.groupBoxBathTranslate.TabStop = false;
-            this.groupBoxBathTranslate.Text = "Use For Bath Translate";
+            this.labelName.Location = new System.Drawing.Point(13, 100);
+            this.labelName.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.labelName.Name = "labelName";
+            this.labelName.Size = new System.Drawing.Size(120, 18);
+            this.labelName.TabIndex = 46;
+            this.labelName.Text = "Name";
             // 
             // PromptTemplateManage
             // 
@@ -269,18 +254,18 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.CancelButton = this.buttonCancel;
-            this.ClientSize = new System.Drawing.Size(540, 677);
-            this.Controls.Add(this.groupBoxBathTranslate);
+            this.ClientSize = new System.Drawing.Size(540, 718);
+            this.Controls.Add(this.labelName);
+            this.Controls.Add(this.groupBoxBatchTranslate);
             this.Controls.Add(this.groupBoxSingleTranslate);
             this.Controls.Add(this.labelAction);
-            this.Controls.Add(this.buttonRename);
             this.Controls.Add(this.buttonDelete);
             this.Controls.Add(this.buttonAdd);
             this.Controls.Add(this.labelTemplates);
             this.Controls.Add(this.buttonCancel);
             this.Controls.Add(this.buttonOK);
+            this.Controls.Add(this.textBoxName);
             this.Controls.Add(this.comboBoxTemplates);
-            this.Controls.Add(this.textBoxTemplate);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
             this.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             this.MaximizeBox = false;
@@ -311,8 +296,7 @@
         private System.Windows.Forms.Label labelSystemPrompt;
         private System.Windows.Forms.Button buttonAdd;
         private System.Windows.Forms.Button buttonDelete;
-        private System.Windows.Forms.Button buttonRename;
-        private System.Windows.Forms.TextBox textBoxTemplate;
+        private System.Windows.Forms.TextBox textBoxName;
         private System.Windows.Forms.ToolTip toolTip;
         private System.Windows.Forms.TextBox textBoxBathTranslateUserPrompt;
         private System.Windows.Forms.Label labelBathTranslateUserPrompt;
@@ -320,6 +304,7 @@
         private System.Windows.Forms.Label labelBathTranslateSystemPrompt;
         private System.Windows.Forms.Label labelAction;
         private System.Windows.Forms.GroupBox groupBoxSingleTranslate;
-        private System.Windows.Forms.GroupBox groupBoxBathTranslate;
+        private System.Windows.Forms.GroupBox groupBoxBatchTranslate;
+        private System.Windows.Forms.Label labelName;
     }
 }

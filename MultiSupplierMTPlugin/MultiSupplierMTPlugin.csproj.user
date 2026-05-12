@@ -17,7 +17,7 @@
     <Compile Update="Forms\ProvidersManage.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Update="Forms\StatsAndLog.cs">
+    <Compile Update="Forms\LogAndStats.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Update="Forms\TranslateCache.cs">

@@ -22,8 +22,6 @@ namespace MultiSupplierMTPlugin.ProvidersCommon.Forms.LLM
 
         private string _currentPromptId;
 
-        private bool _renaming = false;
-
 
         public PromptTemplateManage(MultiSupplierMTGeneralSettings mtGeneralSettings, MultiSupplierMTSecureSettings mtSecureSettings, string currentPromptId)
         {
@@ -55,9 +53,10 @@ namespace MultiSupplierMTPlugin.ProvidersCommon.Forms.LLM
             labelAction.Text = LLH.G(LLK.LabelAction);
             buttonAdd.Text = LLH.G(LLK.ButtonAdd);
             buttonDelete.Text = LLH.G(LLK.ButtonDelete);
-            buttonRename.Text = LLH.G(LLK.ButtonRename);
 
             labelTemplates.Text = LLH.G(LLK.LabelTemplates);
+
+            labelName.Text = LLH.G(LLK.LabelName);
 
             groupBoxSingleTranslate.Text = LLH.G(LLK.GroupBoxSingleTranslate);
             labelSystemPrompt.Text = LLH.G(LLK.LabelSystemPrompt);
@@ -106,28 +105,27 @@ namespace MultiSupplierMTPlugin.ProvidersCommon.Forms.LLM
         private void UpdateControlState()
         {
             bool hasSel = comboBoxTemplates.SelectedIndex != -1;
-            bool hasSelAndRenaming = hasSel & _renaming;
-            bool hasSelNoRenaming = hasSel & !_renaming;
-            bool noEmptyNoRenaming = _promptTemplates.Count > 0 & !_renaming;
+            bool noEmpty = _promptTemplates.Count > 0;
 
-            buttonAdd.Enabled = !_renaming;
-            buttonDelete.Enabled = hasSelNoRenaming;
-            buttonRename.Enabled = hasSel;
+            buttonDelete.Enabled = hasSel;
 
-            textBoxTemplate.Enabled = hasSelAndRenaming;
-            comboBoxTemplates.Enabled = noEmptyNoRenaming;
+            comboBoxTemplates.Enabled = noEmpty;
 
-            textBoxSystemPrompt.Enabled = hasSelNoRenaming;
-            textBoxUserPrompt.Enabled = hasSelNoRenaming;
+            textBoxName.Enabled = hasSel;
 
-            textBoxBathTranslateSystemPrompt.Enabled = hasSelNoRenaming;
-            textBoxBathTranslateUserPrompt.Enabled = hasSelNoRenaming;
+            textBoxSystemPrompt.Enabled = hasSel;
+            textBoxUserPrompt.Enabled = hasSel;
+
+            textBoxBatchTranslateSystemPrompt.Enabled = hasSel;
+            textBoxBatchTranslateUserPrompt.Enabled = hasSel;
         }
 
         private void comboBoxTemplates_SelectedIndexChanged(object sender, EventArgs e)
         {
-            if (comboBoxTemplates.SelectedItem is PromptTemplate prompt)
-            {
+            var prompt = comboBoxTemplates.SelectedItem as PromptTemplate;
+
+            textBoxName.Text = prompt?.Name ?? "";
+
                 textBoxSystemPrompt.Text = prompt?.SystemPrompt
                   .Replace(Environment.NewLine, "\n").Replace("\n", Environment.NewLine) ?? ""; // 解决 xml 反序列化后换行符总是变成 \n
                 textBoxUserPrompt.Text = prompt?.UserPrompt
@@ -138,18 +136,25 @@ namespace MultiSupplierMTPlugin.ProvidersCommon.Forms.LLM
                 textBoxBathTranslateUserPrompt.Text = prompt?.BathTranslateUserPrompt
                     .Replace(Environment.NewLine, "\n").Replace("\n", Environment.NewLine) ?? ""; // 解决 xml 反序列化后换行符总是变成 \n;
             }
-        }
 
 
         private void buttonAdd_Click(object sender, EventArgs e)
         {
-            if (_renaming) return;
-
             string newName = Enumerable.Range(1, int.MaxValue)
                .Select(i => $"New {i}")
                .First(name => !_promptTemplates.Any(p => p.Name == name));
 
-            _promptTemplates.Add(new PromptTemplate() { ID = Guid.NewGuid().ToString(), Name = newName });
+            bool firstNewTpl = _promptTemplates.Count == 0;
+            var defaultTpl = PromptTemplate.GetDefault();
+            _promptTemplates.Add(new PromptTemplate()
+            {
+                ID = Guid.NewGuid().ToString(),
+                Name = newName,
+                SystemPrompt = firstNewTpl ? defaultTpl.SystemPrompt : "",
+                UserPrompt = firstNewTpl ? defaultTpl.UserPrompt : "",
+                BathTranslateSystemPrompt = firstNewTpl ? defaultTpl.BathTranslateSystemPrompt : "",
+                BathTranslateUserPrompt = firstNewTpl ? defaultTpl.BathTranslateUserPrompt : ""
+            });
             UpdateControlState();
 
             if (comboBoxTemplates.Items.Count > 0)
@@ -160,8 +165,6 @@ namespace MultiSupplierMTPlugin.ProvidersCommon.Forms.LLM
 
         private void buttonDelete_Click(object sender, EventArgs e)
         {
-            if (_renaming) return;
-
             int index = comboBoxTemplates.SelectedIndex;
             if (index >= 0 && index < _promptTemplates.Count)
             {
@@ -171,36 +174,23 @@ namespace MultiSupplierMTPlugin.ProvidersCommon.Forms.LLM
             }
         }
 
-        private void buttonRename_Click(object sender, EventArgs e)
+        private void textBoxName_LostFocus(object sender, EventArgs e)
         {
             if (comboBoxTemplates.SelectedItem is PromptTemplate prompt)
             {
-                if (!_renaming)
-                {
-                    textBoxTemplate.Text = prompt.Name;
-                }
-                else
-                {
-                    var name = textBoxTemplate.Text;
+                var name = textBoxName.Text;
 
                     if (_promptTemplates.Any(p => p.Name == name && prompt.Name != name))
                     {
                         MessageBox.Show(LLH.G(LLK.MessageAlreadyExists), "", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    textBoxName.Text = prompt.Name;
                         return;
                     }
 
                     prompt.Name = name;
                     ((CurrencyManager)BindingContext[comboBoxTemplates.DataSource]).Refresh();
                 }
-
-                _renaming = !_renaming;
-                UpdateControlState();
-
-                textBoxTemplate.Visible = _renaming;
-                comboBoxTemplates.Visible = !_renaming;
-                buttonRename.Text = LLH.G(_renaming ? LLK.ButtonApply : LLK.ButtonRename);
             }
-        }
 
         private void textBoxSystemPrompt_TextChanged(object sender, EventArgs e)
         {
@@ -285,14 +275,11 @@ namespace MultiSupplierMTPlugin.ProvidersCommon.Forms.LLM
         [LocalizedValue("7e313363-cc3d-47e7-bd78-3428ce73fd7e", "Delete", "删除")]
         public static PromptTemplateManageLocalizedKey ButtonDelete { get; private set; }
 
-        [LocalizedValue("99c30c93-8b17-4a22-b1c7-e3e8650ddc25", "Rename", "修改")]
-        public static PromptTemplateManageLocalizedKey ButtonRename { get; private set; }
-
-        [LocalizedValue("d2b7d306-4d3a-44e7-b497-3a568870f6ca", "Apply", "应用")]
-        public static PromptTemplateManageLocalizedKey ButtonApply { get; private set; }
-
         [LocalizedValue("c6be6ebf-5421-4640-84c6-e06f9f38a74e", "Templates", "模板")]
         public static PromptTemplateManageLocalizedKey LabelTemplates { get; private set; }
+
+        [LocalizedValue("4c2687ea-c162-4a4f-8dc2-d7bd3770683c", "Name", "名称")]
+        public static PromptTemplateManageLocalizedKey LabelName { get; private set; }
 
         [LocalizedValue("7261c57b-b57a-4c99-864a-d469e973cb28", "Use For Single Translate", "用于单段翻译")]
         public static PromptTemplateManageLocalizedKey GroupBoxSingleTranslate { get; private set; }
@@ -312,7 +299,7 @@ namespace MultiSupplierMTPlugin.ProvidersCommon.Forms.LLM
         [LocalizedValue("51da8b07-42b8-459e-adc7-853fe2ebb782", "User Prompt^", "用户提示词^")]
         public static PromptTemplateManageLocalizedKey LabelBathTranslateUserPrompt { get; private set; }
 
-        [LocalizedValue("f7e49fcd-990c-4166-999d-c0dee50fd85e", "Already exists", "已存在")]
+        [LocalizedValue("f7e49fcd-990c-4166-999d-c0dee50fd85e", "Name already exists", "名称已存在")]
         public static PromptTemplateManageLocalizedKey MessageAlreadyExists { get; private set; }
     }
 }

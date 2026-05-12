@@ -35,8 +35,8 @@ namespace MultiSupplierMTPlugin.Forms
             Text = LLH.G(LLK.Form);
 
             labelShowSupportedOnly.Text = LLH.G(LLK.LabelShowSupportedOnly);
-            radioButtonTrue.Text = LLH.G(LLK.RadioButtonTrue);
-            radioButtonFalse.Text = LLH.G(LLK.RadioButtonFalse);
+            radioButtonYes.Text = LLH.G(LLK.RadioButtonYes);
+            radioButtonNo.Text = LLH.G(LLK.RadioButtonNo);
 
             buttonOK.Text = LLH.G(LLKC.ButtonOK);
             buttonCancel.Text = LLH.G(LLKC.ButtonCancel);
@@ -44,15 +44,15 @@ namespace MultiSupplierMTPlugin.Forms
 
         private void LoadOptions()
         {
-            radioButtonTrue.Checked = _mtGeneralSettings.ShowSupportedRequestTypeOnly;
-            radioButtonFalse.Checked = !_mtGeneralSettings.ShowSupportedRequestTypeOnly;
+            radioButtonYes.Checked = _mtGeneralSettings.ShowSupportedRequestTypeOnly;
+            radioButtonNo.Checked = !_mtGeneralSettings.ShowSupportedRequestTypeOnly;
         }
 
         private void RequestTypeLimit_FormClosing(object sender, FormClosingEventArgs e)
         {
             if (DialogResult == DialogResult.OK)
             {
-                _mtGeneralSettings.ShowSupportedRequestTypeOnly = radioButtonTrue.Checked;
+                _mtGeneralSettings.ShowSupportedRequestTypeOnly = radioButtonYes.Checked;
             }
         }
     }
@@ -74,10 +74,10 @@ namespace MultiSupplierMTPlugin.Forms
         [LocalizedValue("ebd0cd7b-700a-4ceb-a14f-66889eabb66c", "Show Provider Supported Request Type Only: ", "仅显示提供商支持的请求类型：")]
         public static RequestTypeLimitLocalizedKey LabelShowSupportedOnly { get; private set; }
 
-        [LocalizedValue("dee36c19-14b5-4052-9e44-43f1cd69692e", "True", "是")]
-        public static RequestTypeLimitLocalizedKey RadioButtonTrue { get; private set; }
+        [LocalizedValue("dee36c19-14b5-4052-9e44-43f1cd69692e", "Yes", "是")]
+        public static RequestTypeLimitLocalizedKey RadioButtonYes { get; private set; }
 
-        [LocalizedValue("39d3a53e-caf0-4402-b3b5-b2ef88e35c9e", "False", "否")]
-        public static RequestTypeLimitLocalizedKey RadioButtonFalse { get; private set; }
+        [LocalizedValue("39d3a53e-caf0-4402-b3b5-b2ef88e35c9e", "No", "否")]
+        public static RequestTypeLimitLocalizedKey RadioButtonNo { get; private set; }
     }
 }

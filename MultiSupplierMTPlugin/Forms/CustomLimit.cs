@@ -42,7 +42,7 @@ namespace MultiSupplierMTPlugin.Forms
             tabPageSizeLimit.Text = LLH.G(LLK.TabPageSizeLimit);
             labelMaxSegmentsPerRequest.Text = LLH.G(LLK.LabelMaxSegmentsPerRequest);
             labelMaxCharactersPerRequest.Text = LLH.G(LLK.LabelMaxCharactersPerRequest);
-            labelNoBathTip.Text = LLH.G(LLK.LabelNoBathTip);
+            labelNoBatchTip.Text = LLH.G(LLK.LabelNoBatchTip);
 
             toolTip.SetToolTip(numericUpDownMaxSegmentsPerRequest, LLH.G(LLKC.ZeroIndicatesNoLimit));
             toolTip.SetToolTip(numericUpDownMaxCharactersPerRequest, LLH.G(LLKC.ZeroIndicatesNoLimit));
@@ -86,7 +86,7 @@ namespace MultiSupplierMTPlugin.Forms
                 numericUpDownMaxCharactersPerRequest.Value = _mtGeneralSettings.MaxCharactersPerRequest;
                 numericUpDownMaxSegmentsPerRequest.Enabled = true;
                 numericUpDownMaxCharactersPerRequest.Enabled = true;
-                labelNoBathTip.Visible = false;
+                labelNoBatchTip.Visible = false;
             }
             else
             {
@@ -94,7 +94,7 @@ namespace MultiSupplierMTPlugin.Forms
                 numericUpDownMaxCharactersPerRequest.Value = 0;
                 numericUpDownMaxSegmentsPerRequest.Enabled = false;
                 numericUpDownMaxCharactersPerRequest.Enabled = false;
-                labelNoBathTip.Visible = true;
+                labelNoBatchTip.Visible = true;
             }
 
             numericUpDownMaxRequestsPerWindow.Value = _mtGeneralSettings.MaxRequestsPerWindow;
@@ -170,7 +170,7 @@ namespace MultiSupplierMTPlugin.Forms
         public static CustomLimitLocalizedKey LabelMaxCharactersPerRequest { get; private set; }
 
         [LocalizedValue("6cbdf74a-8412-4c20-9d5b-f3eda4fc7f26", "Selected provider no supported batch translation!", "选择的提供商不支持批量翻译！")]
-        public static CustomLimitLocalizedKey LabelNoBathTip { get; private set; }
+        public static CustomLimitLocalizedKey LabelNoBatchTip { get; private set; }
 
         [LocalizedValue("8d3c7ac2-b063-4de9-9d17-233d4a4f46ae", "Rate Limit", "速率限制")]
         public static CustomLimitLocalizedKey TabPageRateLimit { get; private set; }

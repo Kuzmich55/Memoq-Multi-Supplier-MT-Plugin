@@ -43,7 +43,7 @@
             this.checkBoxCustomDisplayName = new System.Windows.Forms.CheckBox();
             this.buttonGithub = new System.Windows.Forms.Button();
             this.linkLabelTranslateCache = new System.Windows.Forms.LinkLabel();
-            this.linkLabelStatsAndLog = new System.Windows.Forms.LinkLabel();
+            this.linkLabelLogAndStats = new System.Windows.Forms.LinkLabel();
             this.checkBoxStatsAndLog = new System.Windows.Forms.CheckBox();
             this.checkBoxTagsToEndFake = new System.Windows.Forms.CheckBox();
             this.checkBoxNormalizeWhitespaceFake = new System.Windows.Forms.CheckBox();
@@ -211,17 +211,17 @@
             this.linkLabelTranslateCache.Text = "Enable Translate Cache";
             this.linkLabelTranslateCache.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.linkLabelTranslateCache_LinkClicked);
             // 
-            // linkLabelStatsAndLog
+            // linkLabelLogAndStats
             // 
-            this.linkLabelStatsAndLog.AutoSize = true;
-            this.linkLabelStatsAndLog.LinkBehavior = System.Windows.Forms.LinkBehavior.NeverUnderline;
-            this.linkLabelStatsAndLog.Location = new System.Drawing.Point(33, 216);
-            this.linkLabelStatsAndLog.Name = "linkLabelStatsAndLog";
-            this.linkLabelStatsAndLog.Size = new System.Drawing.Size(167, 15);
-            this.linkLabelStatsAndLog.TabIndex = 11;
-            this.linkLabelStatsAndLog.TabStop = true;
-            this.linkLabelStatsAndLog.Text = "Enable Stats And Log";
-            this.linkLabelStatsAndLog.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.linkLabelStatsAndLog_LinkClicked);
+            this.linkLabelLogAndStats.AutoSize = true;
+            this.linkLabelLogAndStats.LinkBehavior = System.Windows.Forms.LinkBehavior.NeverUnderline;
+            this.linkLabelLogAndStats.Location = new System.Drawing.Point(33, 216);
+            this.linkLabelLogAndStats.Name = "linkLabelLogAndStats";
+            this.linkLabelLogAndStats.Size = new System.Drawing.Size(175, 15);
+            this.linkLabelLogAndStats.TabIndex = 11;
+            this.linkLabelLogAndStats.TabStop = true;
+            this.linkLabelLogAndStats.Text = "Enable Log And Stats ";
+            this.linkLabelLogAndStats.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.linkLabelLogAndStats_LinkClicked);
             // 
             // checkBoxStatsAndLog
             // 
@@ -296,7 +296,7 @@
             this.Controls.Add(this.linkLabelProvider);
             this.Controls.Add(this.checkBoxNormalizeWhitespaceFake);
             this.Controls.Add(this.checkBoxTagsToEndFake);
-            this.Controls.Add(this.linkLabelStatsAndLog);
+            this.Controls.Add(this.linkLabelLogAndStats);
             this.Controls.Add(this.checkBoxStatsAndLog);
             this.Controls.Add(this.linkLabelTranslateCache);
             this.Controls.Add(this.buttonGithub);
@@ -343,7 +343,7 @@
         private System.Windows.Forms.CheckBox checkBoxCustomDisplayName;
         private System.Windows.Forms.Button buttonGithub;
         private System.Windows.Forms.LinkLabel linkLabelTranslateCache;
-        private System.Windows.Forms.LinkLabel linkLabelStatsAndLog;
+        private System.Windows.Forms.LinkLabel linkLabelLogAndStats;
         private System.Windows.Forms.CheckBox checkBoxStatsAndLog;
         private System.Windows.Forms.CheckBox checkBoxTagsToEndFake;
         private System.Windows.Forms.CheckBox checkBoxNormalizeWhitespaceFake;

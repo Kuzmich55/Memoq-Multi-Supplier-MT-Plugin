@@ -82,7 +82,7 @@ namespace MultiSupplierMTPlugin
 
             linkLabelCustomRequestLimit.Text = LLH.G(LLK.LinkLabelCustomRequestLimit);
             linkLabelCustomDisplayName.Text = LLH.G(LLK.LinkLabelCustomDisplayName);
-            linkLabelStatsAndLog.Text = LLH.G(LLK.LinkLabelStatsAndLog);
+            linkLabelLogAndStats.Text = LLH.G(LLK.LinkLabelLogAndStats);
             linkLabelTranslateCache.Text = LLH.G(LLK.LinkLabelTranslateCache);
 
             buttonOK.Text = LLH.G(LLKC.ButtonOK);
@@ -309,9 +309,9 @@ namespace MultiSupplierMTPlugin
             }
         }
 
-        private void linkLabelStatsAndLog_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+        private void linkLabelLogAndStats_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
         {
-            using (var form = new StatsAndLog(_mtGeneralSettings, _mtSecureSettings))
+            using (var form = new LogAndStats(_mtGeneralSettings, _mtSecureSettings))
             {
                 form.ShowDialog();
             }
@@ -438,8 +438,8 @@ namespace MultiSupplierMTPlugin
         [LocalizedValue("bac7187e-1367-4ffb-a8e9-439d30267790", "Enable Custom Display Name", "启用自定义显示名称")]
         public static MultiSupplierMTOptionsFormLocalizedKey LinkLabelCustomDisplayName { get; private set; }
 
-        [LocalizedValue("63604532-cd5c-4ef8-af3d-3540dc6e3acc", "Enable Stats And Log", "启用统计和日志")]
-        public static MultiSupplierMTOptionsFormLocalizedKey LinkLabelStatsAndLog { get; private set; }
+        [LocalizedValue("63604532-cd5c-4ef8-af3d-3540dc6e3acc", "Enable Log And Stats", "启用日志和统计")]
+        public static MultiSupplierMTOptionsFormLocalizedKey LinkLabelLogAndStats { get; private set; }
 
         [LocalizedValue("73f9781d-d68f-45fa-bcc4-032e077895ed", "Enable Translate Cache", "启用翻译缓存")]
         public static MultiSupplierMTOptionsFormLocalizedKey LinkLabelTranslateCache { get; private set; }

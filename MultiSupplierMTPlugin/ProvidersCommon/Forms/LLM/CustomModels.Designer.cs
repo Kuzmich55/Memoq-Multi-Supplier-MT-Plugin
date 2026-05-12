@@ -33,20 +33,20 @@
             this.labelUserModelsTip1 = new System.Windows.Forms.Label();
             this.textBoxUserModels = new System.Windows.Forms.TextBox();
             this.tabControlModels = new System.Windows.Forms.TabControl();
-            this.tabPageUserModels = new System.Windows.Forms.TabPage();
+            this.tabPageBuiltinModels = new System.Windows.Forms.TabPage();
             this.labelUserModelsTip2 = new System.Windows.Forms.Label();
-            this.tabPageNetworkModels = new System.Windows.Forms.TabPage();
+            this.tabPageUserModels = new System.Windows.Forms.TabPage();
             this.labelNetworkModelsTip2 = new System.Windows.Forms.Label();
             this.textBoxNetworkModels = new System.Windows.Forms.TextBox();
             this.labelNetworkModelsTip1 = new System.Windows.Forms.Label();
-            this.tabPageBuiltinModels = new System.Windows.Forms.TabPage();
+            this.tabPageNetworkModels = new System.Windows.Forms.TabPage();
             this.checkedListBoxBuildinModels = new System.Windows.Forms.CheckedListBox();
             this.linkLabelAllDisable = new System.Windows.Forms.LinkLabel();
             this.linkLabelAllEnable = new System.Windows.Forms.LinkLabel();
             this.tabControlModels.SuspendLayout();
+            this.tabPageBuiltinModels.SuspendLayout();
             this.tabPageUserModels.SuspendLayout();
             this.tabPageNetworkModels.SuspendLayout();
-            this.tabPageBuiltinModels.SuspendLayout();
             this.SuspendLayout();
             // 
             // buttonOK
@@ -76,7 +76,7 @@
             // labelUserModelsTip1
             // 
             this.labelUserModelsTip1.AutoSize = true;
-            this.labelUserModelsTip1.Location = new System.Drawing.Point(8, 225);
+            this.labelUserModelsTip1.Location = new System.Drawing.Point(11, 226);
             this.labelUserModelsTip1.Name = "labelUserModelsTip1";
             this.labelUserModelsTip1.Size = new System.Drawing.Size(375, 15);
             this.labelUserModelsTip1.TabIndex = 1;
@@ -85,7 +85,7 @@
             // textBoxUserModels
             // 
             this.textBoxUserModels.AcceptsReturn = true;
-            this.textBoxUserModels.Location = new System.Drawing.Point(8, 9);
+            this.textBoxUserModels.Location = new System.Drawing.Point(11, 10);
             this.textBoxUserModels.Multiline = true;
             this.textBoxUserModels.Name = "textBoxUserModels";
             this.textBoxUserModels.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
@@ -94,14 +94,36 @@
             // 
             // tabControlModels
             // 
+            this.tabControlModels.Controls.Add(this.tabPageBuiltinModels);
             this.tabControlModels.Controls.Add(this.tabPageUserModels);
             this.tabControlModels.Controls.Add(this.tabPageNetworkModels);
-            this.tabControlModels.Controls.Add(this.tabPageBuiltinModels);
             this.tabControlModels.Location = new System.Drawing.Point(12, 12);
             this.tabControlModels.Name = "tabControlModels";
             this.tabControlModels.SelectedIndex = 0;
             this.tabControlModels.Size = new System.Drawing.Size(508, 305);
             this.tabControlModels.TabIndex = 12;
+            // 
+            // tabPageBuiltinModels
+            // 
+            this.tabPageBuiltinModels.Controls.Add(this.checkedListBoxBuildinModels);
+            this.tabPageBuiltinModels.Controls.Add(this.linkLabelAllEnable);
+            this.tabPageBuiltinModels.Controls.Add(this.linkLabelAllDisable);
+            this.tabPageBuiltinModels.Location = new System.Drawing.Point(4, 25);
+            this.tabPageBuiltinModels.Name = "tabPageBuiltinModels";
+            this.tabPageBuiltinModels.Padding = new System.Windows.Forms.Padding(3);
+            this.tabPageBuiltinModels.Size = new System.Drawing.Size(500, 276);
+            this.tabPageBuiltinModels.TabIndex = 0;
+            this.tabPageBuiltinModels.Text = "Builtin Models";
+            this.tabPageBuiltinModels.UseVisualStyleBackColor = true;
+            // 
+            // labelUserModelsTip2
+            // 
+            this.labelUserModelsTip2.AutoSize = true;
+            this.labelUserModelsTip2.Location = new System.Drawing.Point(11, 254);
+            this.labelUserModelsTip2.Name = "labelUserModelsTip2";
+            this.labelUserModelsTip2.Size = new System.Drawing.Size(367, 15);
+            this.labelUserModelsTip2.TabIndex = 2;
+            this.labelUserModelsTip2.Text = "Use \"=\" to set aliases, e.g., gpt-4o-mini=xxx";
             // 
             // tabPageUserModels
             // 
@@ -112,36 +134,14 @@
             this.tabPageUserModels.Name = "tabPageUserModels";
             this.tabPageUserModels.Padding = new System.Windows.Forms.Padding(3);
             this.tabPageUserModels.Size = new System.Drawing.Size(500, 276);
-            this.tabPageUserModels.TabIndex = 0;
+            this.tabPageUserModels.TabIndex = 1;
             this.tabPageUserModels.Text = "User Models";
             this.tabPageUserModels.UseVisualStyleBackColor = true;
-            // 
-            // labelUserModelsTip2
-            // 
-            this.labelUserModelsTip2.AutoSize = true;
-            this.labelUserModelsTip2.Location = new System.Drawing.Point(8, 253);
-            this.labelUserModelsTip2.Name = "labelUserModelsTip2";
-            this.labelUserModelsTip2.Size = new System.Drawing.Size(367, 15);
-            this.labelUserModelsTip2.TabIndex = 2;
-            this.labelUserModelsTip2.Text = "Use \"=\" to set aliases, e.g., gpt-4o-mini=xxx";
-            // 
-            // tabPageNetworkModels
-            // 
-            this.tabPageNetworkModels.Controls.Add(this.labelNetworkModelsTip2);
-            this.tabPageNetworkModels.Controls.Add(this.textBoxNetworkModels);
-            this.tabPageNetworkModels.Controls.Add(this.labelNetworkModelsTip1);
-            this.tabPageNetworkModels.Location = new System.Drawing.Point(4, 25);
-            this.tabPageNetworkModels.Name = "tabPageNetworkModels";
-            this.tabPageNetworkModels.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPageNetworkModels.Size = new System.Drawing.Size(500, 276);
-            this.tabPageNetworkModels.TabIndex = 1;
-            this.tabPageNetworkModels.Text = "Network Models";
-            this.tabPageNetworkModels.UseVisualStyleBackColor = true;
             // 
             // labelNetworkModelsTip2
             // 
             this.labelNetworkModelsTip2.AutoSize = true;
-            this.labelNetworkModelsTip2.Location = new System.Drawing.Point(8, 253);
+            this.labelNetworkModelsTip2.Location = new System.Drawing.Point(11, 254);
             this.labelNetworkModelsTip2.Name = "labelNetworkModelsTip2";
             this.labelNetworkModelsTip2.Size = new System.Drawing.Size(463, 15);
             this.labelNetworkModelsTip2.TabIndex = 2;
@@ -151,7 +151,7 @@
             // 
             this.textBoxNetworkModels.BackColor = System.Drawing.SystemColors.Window;
             this.textBoxNetworkModels.HideSelection = false;
-            this.textBoxNetworkModels.Location = new System.Drawing.Point(8, 9);
+            this.textBoxNetworkModels.Location = new System.Drawing.Point(11, 10);
             this.textBoxNetworkModels.Multiline = true;
             this.textBoxNetworkModels.Name = "textBoxNetworkModels";
             this.textBoxNetworkModels.ReadOnly = true;
@@ -162,32 +162,32 @@
             // labelNetworkModelsTip1
             // 
             this.labelNetworkModelsTip1.AutoSize = true;
-            this.labelNetworkModelsTip1.Location = new System.Drawing.Point(8, 226);
+            this.labelNetworkModelsTip1.Location = new System.Drawing.Point(11, 227);
             this.labelNetworkModelsTip1.MaximumSize = new System.Drawing.Size(500, 0);
             this.labelNetworkModelsTip1.Name = "labelNetworkModelsTip1";
-            this.labelNetworkModelsTip1.Size = new System.Drawing.Size(423, 15);
+            this.labelNetworkModelsTip1.Size = new System.Drawing.Size(463, 15);
             this.labelNetworkModelsTip1.TabIndex = 1;
-            this.labelNetworkModelsTip1.Text = "Load models into Network Models from main form first";
+            this.labelNetworkModelsTip1.Text = "This list shows the network models loaded in the previous";
             // 
-            // tabPageBuiltinModels
+            // tabPageNetworkModels
             // 
-            this.tabPageBuiltinModels.Controls.Add(this.checkedListBoxBuildinModels);
-            this.tabPageBuiltinModels.Controls.Add(this.linkLabelAllDisable);
-            this.tabPageBuiltinModels.Controls.Add(this.linkLabelAllEnable);
-            this.tabPageBuiltinModels.Location = new System.Drawing.Point(4, 25);
-            this.tabPageBuiltinModels.Name = "tabPageBuiltinModels";
-            this.tabPageBuiltinModels.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPageBuiltinModels.Size = new System.Drawing.Size(500, 276);
-            this.tabPageBuiltinModels.TabIndex = 2;
-            this.tabPageBuiltinModels.Text = "Builtin Models";
-            this.tabPageBuiltinModels.UseVisualStyleBackColor = true;
+            this.tabPageNetworkModels.Controls.Add(this.labelNetworkModelsTip2);
+            this.tabPageNetworkModels.Controls.Add(this.textBoxNetworkModels);
+            this.tabPageNetworkModels.Controls.Add(this.labelNetworkModelsTip1);
+            this.tabPageNetworkModels.Location = new System.Drawing.Point(4, 25);
+            this.tabPageNetworkModels.Name = "tabPageNetworkModels";
+            this.tabPageNetworkModels.Padding = new System.Windows.Forms.Padding(3);
+            this.tabPageNetworkModels.Size = new System.Drawing.Size(500, 276);
+            this.tabPageNetworkModels.TabIndex = 2;
+            this.tabPageNetworkModels.Text = "Network Models";
+            this.tabPageNetworkModels.UseVisualStyleBackColor = true;
             // 
             // checkedListBoxBuildinModels
             // 
             this.checkedListBoxBuildinModels.BackColor = System.Drawing.SystemColors.Window;
             this.checkedListBoxBuildinModels.CheckOnClick = true;
             this.checkedListBoxBuildinModels.FormattingEnabled = true;
-            this.checkedListBoxBuildinModels.Location = new System.Drawing.Point(8, 9);
+            this.checkedListBoxBuildinModels.Location = new System.Drawing.Point(11, 10);
             this.checkedListBoxBuildinModels.Name = "checkedListBoxBuildinModels";
             this.checkedListBoxBuildinModels.ScrollAlwaysVisible = true;
             this.checkedListBoxBuildinModels.Size = new System.Drawing.Size(481, 204);
@@ -197,7 +197,7 @@
             // 
             this.linkLabelAllDisable.AutoSize = true;
             this.linkLabelAllDisable.LinkBehavior = System.Windows.Forms.LinkBehavior.NeverUnderline;
-            this.linkLabelAllDisable.Location = new System.Drawing.Point(351, 234);
+            this.linkLabelAllDisable.Location = new System.Drawing.Point(354, 235);
             this.linkLabelAllDisable.Name = "linkLabelAllDisable";
             this.linkLabelAllDisable.Size = new System.Drawing.Size(95, 15);
             this.linkLabelAllDisable.TabIndex = 2;
@@ -209,7 +209,7 @@
             // 
             this.linkLabelAllEnable.AutoSize = true;
             this.linkLabelAllEnable.LinkBehavior = System.Windows.Forms.LinkBehavior.NeverUnderline;
-            this.linkLabelAllEnable.Location = new System.Drawing.Point(56, 234);
+            this.linkLabelAllEnable.Location = new System.Drawing.Point(59, 235);
             this.linkLabelAllEnable.Name = "linkLabelAllEnable";
             this.linkLabelAllEnable.Size = new System.Drawing.Size(87, 15);
             this.linkLabelAllEnable.TabIndex = 1;
@@ -223,7 +223,7 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.CancelButton = this.buttonCancel;
-            this.ClientSize = new System.Drawing.Size(532, 364);
+            this.ClientSize = new System.Drawing.Size(526, 364);
             this.Controls.Add(this.tabControlModels);
             this.Controls.Add(this.buttonCancel);
             this.Controls.Add(this.buttonOK);
@@ -238,12 +238,12 @@
             this.Text = "Custom Model List";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.CustomModels_FormClosing);
             this.tabControlModels.ResumeLayout(false);
+            this.tabPageBuiltinModels.ResumeLayout(false);
+            this.tabPageBuiltinModels.PerformLayout();
             this.tabPageUserModels.ResumeLayout(false);
             this.tabPageUserModels.PerformLayout();
             this.tabPageNetworkModels.ResumeLayout(false);
             this.tabPageNetworkModels.PerformLayout();
-            this.tabPageBuiltinModels.ResumeLayout(false);
-            this.tabPageBuiltinModels.PerformLayout();
             this.ResumeLayout(false);
 
         }
@@ -254,9 +254,9 @@
         private System.Windows.Forms.Label labelUserModelsTip1;
         private System.Windows.Forms.TextBox textBoxUserModels;
         private System.Windows.Forms.TabControl tabControlModels;
+        private System.Windows.Forms.TabPage tabPageBuiltinModels;
         private System.Windows.Forms.TabPage tabPageUserModels;
         private System.Windows.Forms.TabPage tabPageNetworkModels;
-        private System.Windows.Forms.TabPage tabPageBuiltinModels;
         private System.Windows.Forms.Label labelUserModelsTip2;
         private System.Windows.Forms.Label labelNetworkModelsTip2;
         private System.Windows.Forms.TextBox textBoxNetworkModels;

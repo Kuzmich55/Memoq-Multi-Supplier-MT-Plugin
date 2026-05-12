@@ -31,8 +31,8 @@
             this.buttonOK = new System.Windows.Forms.Button();
             this.buttonCancel = new System.Windows.Forms.Button();
             this.labelShowSupportedOnly = new System.Windows.Forms.Label();
-            this.radioButtonTrue = new System.Windows.Forms.RadioButton();
-            this.radioButtonFalse = new System.Windows.Forms.RadioButton();
+            this.radioButtonYes = new System.Windows.Forms.RadioButton();
+            this.radioButtonNo = new System.Windows.Forms.RadioButton();
             this.SuspendLayout();
             // 
             // buttonOK
@@ -68,27 +68,27 @@
             this.labelShowSupportedOnly.TabIndex = 0;
             this.labelShowSupportedOnly.Text = "Show Provider Supported Request Type Only: ";
             // 
-            // radioButtonTrue
+            // radioButtonYes
             // 
-            this.radioButtonTrue.AutoSize = true;
-            this.radioButtonTrue.Location = new System.Drawing.Point(100, 63);
-            this.radioButtonTrue.Name = "radioButtonTrue";
-            this.radioButtonTrue.Size = new System.Drawing.Size(60, 19);
-            this.radioButtonTrue.TabIndex = 1;
-            this.radioButtonTrue.TabStop = true;
-            this.radioButtonTrue.Text = "True";
-            this.radioButtonTrue.UseVisualStyleBackColor = true;
+            this.radioButtonYes.AutoSize = true;
+            this.radioButtonYes.Location = new System.Drawing.Point(100, 63);
+            this.radioButtonYes.Name = "radioButtonYes";
+            this.radioButtonYes.Size = new System.Drawing.Size(52, 19);
+            this.radioButtonYes.TabIndex = 1;
+            this.radioButtonYes.TabStop = true;
+            this.radioButtonYes.Text = "Yes";
+            this.radioButtonYes.UseVisualStyleBackColor = true;
             // 
-            // radioButtonFalse
+            // radioButtonNo
             // 
-            this.radioButtonFalse.AutoSize = true;
-            this.radioButtonFalse.Location = new System.Drawing.Point(332, 63);
-            this.radioButtonFalse.Name = "radioButtonFalse";
-            this.radioButtonFalse.Size = new System.Drawing.Size(68, 19);
-            this.radioButtonFalse.TabIndex = 2;
-            this.radioButtonFalse.TabStop = true;
-            this.radioButtonFalse.Text = "False";
-            this.radioButtonFalse.UseVisualStyleBackColor = true;
+            this.radioButtonNo.AutoSize = true;
+            this.radioButtonNo.Location = new System.Drawing.Point(332, 63);
+            this.radioButtonNo.Name = "radioButtonNo";
+            this.radioButtonNo.Size = new System.Drawing.Size(44, 19);
+            this.radioButtonNo.TabIndex = 2;
+            this.radioButtonNo.TabStop = true;
+            this.radioButtonNo.Text = "No";
+            this.radioButtonNo.UseVisualStyleBackColor = true;
             // 
             // RequestTypeLimit
             // 
@@ -97,8 +97,8 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.CancelButton = this.buttonCancel;
             this.ClientSize = new System.Drawing.Size(510, 148);
-            this.Controls.Add(this.radioButtonFalse);
-            this.Controls.Add(this.radioButtonTrue);
+            this.Controls.Add(this.radioButtonNo);
+            this.Controls.Add(this.radioButtonYes);
             this.Controls.Add(this.labelShowSupportedOnly);
             this.Controls.Add(this.buttonCancel);
             this.Controls.Add(this.buttonOK);
@@ -121,7 +121,7 @@
         private System.Windows.Forms.Button buttonOK;
         private System.Windows.Forms.Button buttonCancel;
         private System.Windows.Forms.Label labelShowSupportedOnly;
-        private System.Windows.Forms.RadioButton radioButtonTrue;
-        private System.Windows.Forms.RadioButton radioButtonFalse;
+        private System.Windows.Forms.RadioButton radioButtonYes;
+        private System.Windows.Forms.RadioButton radioButtonNo;
     }
 }

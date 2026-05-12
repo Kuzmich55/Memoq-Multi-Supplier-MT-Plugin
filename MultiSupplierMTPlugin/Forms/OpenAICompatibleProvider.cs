@@ -19,8 +19,6 @@ namespace MultiSupplierMTPlugin.Forms
 
         private BindingList<OpenAICompatibleServiceInfo> _providers;
 
-        private bool _renaming = false;
-
         public OpenAICompatibleProvider(MultiSupplierMTGeneralSettings mtGeneralSettings, MultiSupplierMTSecureSettings mtSecureSettings)
         {
             InitializeComponent();
@@ -46,24 +44,24 @@ namespace MultiSupplierMTPlugin.Forms
 
             labelAction.Text = LLH.G(LLK.LabelAction);
             buttonAdd.Text = LLH.G(LLK.ButtonAdd);
-            buttonDelete.Text = LLH.G(LLK.ButtonDelete);
-            buttonRename.Text = LLH.G(LLK.ButtonRename);
+            buttonDelete.Text = LLH.G(LLK.ButtonDelete);            
 
             labelProviders.Text = LLH.G(LLK.LabelProviders);
 
-            groupBoxRequest.Text = LLH.G(LLK.GroupBoxRequest);
+            groupBoxRequired.Text = LLH.G(LLK.GroupBoxRequired);
+            labelDisplayName.Text = LLH.G(LLK.LabelDisplayName);
             labelBaseURL.Text = LLH.G(LLK.LabelBaseURL);
             labelPath.Text = LLH.G(LLK.LabelPath);
             toolTip.SetToolTip(textBoxBaseURL, $"{textExample} https://api.openai.com/v1");
             toolTip.SetToolTip(textBoxPath, $"{textExample} /chat/completions");
 
-            groupBoxModel.Text = LLH.G(LLK.GroupBoxModel);
+            groupBoxRecommended.Text = LLH.G(LLK.GroupBoxRecommended);
             labelDefaultModel.Text = LLH.G(LLK.LabelDefaultModel);
             labelModelList.Text = LLH.G(LLK.LabelModelList);
             toolTip.SetToolTip(textBoxDefaultModel, $"{textExample} gpt-4o-mini");
             toolTip.SetToolTip(textBoxModelList, $"{textExample} gpt-4o, gpt-4o-mini, gpt-4.1, gpt-4.1-mini");
 
-            groupBoxLink.Text = LLH.G(LLK.GroupBoxLink);
+            groupBoxOptional.Text = LLH.G(LLK.GroupBoxOptional);
             labelApiKeyLink.Text = LLH.G(LLK.LabelApiKeyLink);
             labelModelsLink.Text = LLH.G(LLK.LabelModelsLink);
             labelDocLink.Text = LLH.G(LLK.LabelDocLink);
@@ -92,32 +90,29 @@ namespace MultiSupplierMTPlugin.Forms
         private void UpdateControlState()
         {
             bool hasSel = comboBoxProviders.SelectedIndex != -1;
-            bool hasSelAndRenaming = hasSel & _renaming;
-            bool hasSelNoRenaming = hasSel & !_renaming;
-            bool noEmptyNoRenaming = _providers.Count > 0 & !_renaming;
+            bool noEmpty = _providers.Count > 0;
 
-            buttonAdd.Enabled = !_renaming;
-            buttonDelete.Enabled = hasSelNoRenaming;
-            buttonRename.Enabled = hasSel;
+            buttonDelete.Enabled = hasSel;
 
-            textBoxProvider.Enabled = hasSelAndRenaming;
-            comboBoxProviders.Enabled = noEmptyNoRenaming;
+            comboBoxProviders.Enabled = noEmpty;
 
-            textBoxBaseURL.Enabled = hasSelNoRenaming;
-            textBoxPath.Enabled = hasSelNoRenaming;
+            textBoxDisplayName.Enabled = hasSel;
+            textBoxBaseURL.Enabled = hasSel;
+            textBoxPath.Enabled = hasSel;
 
-            textBoxDefaultModel.Enabled = hasSelNoRenaming;
-            textBoxModelList.Enabled = hasSelNoRenaming;
+            textBoxDefaultModel.Enabled = hasSel;
+            textBoxModelList.Enabled = hasSel;
 
-            textBoxApiKeyLink.Enabled = hasSelNoRenaming;
-            textBoxModelsLink.Enabled = hasSelNoRenaming;
-            textBoxDocLink.Enabled = hasSelNoRenaming;
+            textBoxApiKeyLink.Enabled = hasSel;
+            textBoxModelsLink.Enabled = hasSel;
+            textBoxDocLink.Enabled = hasSel;
         }
 
         private void comboBoxProviders_SelectedIndexChanged(object sender, EventArgs e)
         {
             var selected = comboBoxProviders.SelectedItem as OpenAICompatibleServiceInfo;
 
+            textBoxDisplayName.Text = selected?.DisplayName ?? "";
             textBoxBaseURL.Text = selected?.BaseURL ?? "";
             textBoxPath.Text = selected?.Path ?? "";
 
@@ -132,8 +127,6 @@ namespace MultiSupplierMTPlugin.Forms
 
         private void buttonAdd_Click(object sender, EventArgs e)
         {
-            if (_renaming) return;
-
             string displayName = Enumerable.Range(1, int.MaxValue)
                 .Select(i => $"Custom LLM {i}")
                 .First(name => !_providers.Any(p => p.DisplayName == name));
@@ -159,8 +152,6 @@ namespace MultiSupplierMTPlugin.Forms
 
         private void buttonDelete_Click(object sender, EventArgs e)
         {
-            if (_renaming) return;
-
             int index = comboBoxProviders.SelectedIndex;
             if (index >= 0 && index < _providers.Count)
             {
@@ -178,35 +169,21 @@ namespace MultiSupplierMTPlugin.Forms
             }
         }
 
-        private void buttonRename_Click(object sender, EventArgs e)
+        private void textBoxDisplayName_LostFocus(object sender, EventArgs e)
         {
             if (comboBoxProviders.SelectedItem is OpenAICompatibleServiceInfo provider)
             {
-                if (!_renaming)
-                {
-                    textBoxProvider.Text = provider.DisplayName;
-                }
-                else
-                {
-                    var displayName = textBoxProvider.Text;
+                var displayName = textBoxDisplayName.Text;
 
-                    if (_providers.Any(p => p.DisplayName == displayName && provider.DisplayName != displayName))
-                    {
-                        MessageBox.Show(LLH.G(LLK.MessageAlreadyExists), "", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                        return;
-                    }
-
-                    provider.DisplayName = displayName;
-                    ((CurrencyManager)BindingContext[comboBoxProviders.DataSource]).Refresh();
+                if (_providers.Any(p => p.DisplayName == displayName && provider.DisplayName != displayName))
+                {
+                    MessageBox.Show(LLH.G(LLK.MessageAlreadyExists), "", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    textBoxDisplayName.Text = provider.DisplayName;
+                    return;
                 }
 
-                _renaming = !_renaming;
-
-                UpdateControlState();
-
-                textBoxProvider.Visible = _renaming;
-                comboBoxProviders.Visible = !_renaming;
-                buttonRename.Text = LLH.G(_renaming ? LLK.ButtonApply : LLK.ButtonRename);
+                provider.DisplayName = displayName;
+                ((CurrencyManager)BindingContext[comboBoxProviders.DataSource]).Refresh();
             }
         }
 
@@ -314,20 +291,17 @@ namespace MultiSupplierMTPlugin.Forms
         [LocalizedValue("e25af8c6-d6c8-4a5a-b5d6-b9ed2d4de11c", "Delete", "删除")]
         public static OpenAICompatibleProviderLocalizedKey ButtonDelete { get; private set; }
 
-        [LocalizedValue("9ac7d334-593b-467b-aa26-d1ff2742df7d", "Rename", "修改")]
-        public static OpenAICompatibleProviderLocalizedKey ButtonRename { get; private set; }
-
-        [LocalizedValue("56c4a8b9-9767-41d7-b881-369fddd2c9f1", "Apply", "应用")]
-        public static OpenAICompatibleProviderLocalizedKey ButtonApply { get; private set; }
-
-        [LocalizedValue("c951715b-5798-45f6-bcf0-6b43e11c911e", "Already exists", "已存在")]
+        [LocalizedValue("c951715b-5798-45f6-bcf0-6b43e11c911e", "Name already exists", "名称已存在")]
         public static OpenAICompatibleProviderLocalizedKey MessageAlreadyExists { get; private set; }
 
         [LocalizedValue("31ea05e3-1ddf-459c-a70e-482314262334", "Providers", "提供商")]
         public static OpenAICompatibleProviderLocalizedKey LabelProviders { get; private set; }
 
-        [LocalizedValue("9fcfa7ff-0715-45c8-a408-d136a163d6da", "", "")]
-        public static OpenAICompatibleProviderLocalizedKey GroupBoxRequest { get; private set; }
+        [LocalizedValue("9fcfa7ff-0715-45c8-a408-d136a163d6da", "Required options", "必需填写选项")]
+        public static OpenAICompatibleProviderLocalizedKey GroupBoxRequired { get; private set; }
+
+        [LocalizedValue("f1889bee-c29f-47dc-906a-2c91c7f9f1ee", "Name", "名称")]
+        public static OpenAICompatibleProviderLocalizedKey LabelDisplayName { get; private set; }
 
         [LocalizedValue("8006d48d-e451-43b9-8d2c-19c207de9778", "Base URL", "请求基址")]
         public static OpenAICompatibleProviderLocalizedKey LabelBaseURL { get; private set; }
@@ -335,8 +309,8 @@ namespace MultiSupplierMTPlugin.Forms
         [LocalizedValue("f9711834-13d5-4889-9af7-0f570d7e764e", "Path", "请求路径")]
         public static OpenAICompatibleProviderLocalizedKey LabelPath { get; private set; }
 
-        [LocalizedValue("f20cd21b-512a-44b7-8183-311bd13211f4", "", "")]
-        public static OpenAICompatibleProviderLocalizedKey GroupBoxModel { get; private set; }
+        [LocalizedValue("f20cd21b-512a-44b7-8183-311bd13211f4", "Recommended options", "推荐填写选项")]
+        public static OpenAICompatibleProviderLocalizedKey GroupBoxRecommended { get; private set; }
 
         [LocalizedValue("7b40d8ed-7d70-4a3b-b507-17f268bd0934", "Default Model", "默认模型")]
         public static OpenAICompatibleProviderLocalizedKey LabelDefaultModel { get; private set; }
@@ -344,8 +318,8 @@ namespace MultiSupplierMTPlugin.Forms
         [LocalizedValue("83074b6f-41b5-44f9-a9a3-9df5ca322548", "Model List", "模型列表")]
         public static OpenAICompatibleProviderLocalizedKey LabelModelList { get; private set; }
 
-        [LocalizedValue("4ad4f443-afca-4c13-a475-5cf183d37230", "", "")]
-        public static OpenAICompatibleProviderLocalizedKey GroupBoxLink { get; private set; }
+        [LocalizedValue("4ad4f443-afca-4c13-a475-5cf183d37230", "Optional options", "可选填写选项")]
+        public static OpenAICompatibleProviderLocalizedKey GroupBoxOptional { get; private set; }
 
         [LocalizedValue("a5d4735a-0ba4-4a0d-a725-088d9793c840", "Api Key Link", "密钥链接")]
         public static OpenAICompatibleProviderLocalizedKey LabelApiKeyLink { get; private set; }

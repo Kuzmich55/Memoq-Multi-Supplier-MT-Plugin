@@ -35,8 +35,6 @@
             this.labelProviders = new System.Windows.Forms.Label();
             this.buttonAdd = new System.Windows.Forms.Button();
             this.buttonDelete = new System.Windows.Forms.Button();
-            this.buttonRename = new System.Windows.Forms.Button();
-            this.textBoxProvider = new System.Windows.Forms.TextBox();
             this.labelAction = new System.Windows.Forms.Label();
             this.textBoxApiKeyLink = new System.Windows.Forms.TextBox();
             this.textBoxBaseURL = new System.Windows.Forms.TextBox();
@@ -52,20 +50,22 @@
             this.labelModelsLink = new System.Windows.Forms.Label();
             this.labelApiKeyLink = new System.Windows.Forms.Label();
             this.labelDocLink = new System.Windows.Forms.Label();
-            this.groupBoxLink = new System.Windows.Forms.GroupBox();
-            this.groupBoxModel = new System.Windows.Forms.GroupBox();
-            this.groupBoxRequest = new System.Windows.Forms.GroupBox();
+            this.groupBoxOptional = new System.Windows.Forms.GroupBox();
+            this.groupBoxRecommended = new System.Windows.Forms.GroupBox();
+            this.groupBoxRequired = new System.Windows.Forms.GroupBox();
+            this.labelDisplayName = new System.Windows.Forms.Label();
+            this.textBoxDisplayName = new System.Windows.Forms.TextBox();
             this.toolTip = new System.Windows.Forms.ToolTip(this.components);
-            this.groupBoxLink.SuspendLayout();
-            this.groupBoxModel.SuspendLayout();
-            this.groupBoxRequest.SuspendLayout();
+            this.groupBoxOptional.SuspendLayout();
+            this.groupBoxRecommended.SuspendLayout();
+            this.groupBoxRequired.SuspendLayout();
             this.SuspendLayout();
             // 
             // buttonCancel
             // 
             this.buttonCancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.buttonCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this.buttonCancel.Location = new System.Drawing.Point(425, 523);
+            this.buttonCancel.Location = new System.Drawing.Point(425, 582);
             this.buttonCancel.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             this.buttonCancel.Name = "buttonCancel";
             this.buttonCancel.Size = new System.Drawing.Size(103, 27);
@@ -77,7 +77,7 @@
             // 
             this.buttonOK.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.buttonOK.DialogResult = System.Windows.Forms.DialogResult.OK;
-            this.buttonOK.Location = new System.Drawing.Point(316, 523);
+            this.buttonOK.Location = new System.Drawing.Point(316, 582);
             this.buttonOK.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             this.buttonOK.Name = "buttonOK";
             this.buttonOK.Size = new System.Drawing.Size(100, 27);
@@ -92,7 +92,7 @@
             this.comboBoxProviders.Location = new System.Drawing.Point(152, 55);
             this.comboBoxProviders.Name = "comboBoxProviders";
             this.comboBoxProviders.Size = new System.Drawing.Size(364, 23);
-            this.comboBoxProviders.TabIndex = 5;
+            this.comboBoxProviders.TabIndex = 4;
             this.comboBoxProviders.SelectedIndexChanged += new System.EventHandler(this.comboBoxProviders_SelectedIndexChanged);
             // 
             // labelProviders
@@ -101,7 +101,7 @@
             this.labelProviders.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.labelProviders.Name = "labelProviders";
             this.labelProviders.Size = new System.Drawing.Size(120, 18);
-            this.labelProviders.TabIndex = 4;
+            this.labelProviders.TabIndex = 3;
             this.labelProviders.Text = "Providers";
             // 
             // buttonAdd
@@ -117,7 +117,7 @@
             // 
             // buttonDelete
             // 
-            this.buttonDelete.Location = new System.Drawing.Point(298, 10);
+            this.buttonDelete.Location = new System.Drawing.Point(441, 10);
             this.buttonDelete.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             this.buttonDelete.Name = "buttonDelete";
             this.buttonDelete.Size = new System.Drawing.Size(74, 27);
@@ -125,25 +125,6 @@
             this.buttonDelete.Text = "Delete";
             this.buttonDelete.UseVisualStyleBackColor = true;
             this.buttonDelete.Click += new System.EventHandler(this.buttonDelete_Click);
-            // 
-            // buttonRename
-            // 
-            this.buttonRename.Location = new System.Drawing.Point(442, 10);
-            this.buttonRename.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            this.buttonRename.Name = "buttonRename";
-            this.buttonRename.Size = new System.Drawing.Size(74, 27);
-            this.buttonRename.TabIndex = 3;
-            this.buttonRename.Text = "Rename";
-            this.buttonRename.UseVisualStyleBackColor = true;
-            this.buttonRename.Click += new System.EventHandler(this.buttonRename_Click);
-            // 
-            // textBoxProvider
-            // 
-            this.textBoxProvider.Location = new System.Drawing.Point(152, 54);
-            this.textBoxProvider.Name = "textBoxProvider";
-            this.textBoxProvider.Size = new System.Drawing.Size(364, 25);
-            this.textBoxProvider.TabIndex = 6;
-            this.textBoxProvider.Visible = false;
             // 
             // labelAction
             // 
@@ -164,7 +145,7 @@
             // 
             // textBoxBaseURL
             // 
-            this.textBoxBaseURL.Location = new System.Drawing.Point(136, 30);
+            this.textBoxBaseURL.Location = new System.Drawing.Point(136, 73);
             this.textBoxBaseURL.Name = "textBoxBaseURL";
             this.textBoxBaseURL.Size = new System.Drawing.Size(364, 25);
             this.textBoxBaseURL.TabIndex = 9;
@@ -180,7 +161,7 @@
             // 
             // textBoxPath
             // 
-            this.textBoxPath.Location = new System.Drawing.Point(136, 75);
+            this.textBoxPath.Location = new System.Drawing.Point(136, 116);
             this.textBoxPath.Name = "textBoxPath";
             this.textBoxPath.Size = new System.Drawing.Size(364, 25);
             this.textBoxPath.TabIndex = 11;
@@ -212,7 +193,7 @@
             // 
             // labelBaseURL
             // 
-            this.labelBaseURL.Location = new System.Drawing.Point(9, 33);
+            this.labelBaseURL.Location = new System.Drawing.Point(9, 76);
             this.labelBaseURL.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.labelBaseURL.Name = "labelBaseURL";
             this.labelBaseURL.Size = new System.Drawing.Size(120, 18);
@@ -221,7 +202,7 @@
             // 
             // labelPath
             // 
-            this.labelPath.Location = new System.Drawing.Point(9, 78);
+            this.labelPath.Location = new System.Drawing.Point(9, 119);
             this.labelPath.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.labelPath.Name = "labelPath";
             this.labelPath.Size = new System.Drawing.Size(120, 18);
@@ -273,43 +254,65 @@
             this.labelDocLink.TabIndex = 22;
             this.labelDocLink.Text = "Doc Link";
             // 
-            // groupBoxLink
+            // groupBoxOptional
             // 
-            this.groupBoxLink.Controls.Add(this.labelApiKeyLink);
-            this.groupBoxLink.Controls.Add(this.labelDocLink);
-            this.groupBoxLink.Controls.Add(this.textBoxApiKeyLink);
-            this.groupBoxLink.Controls.Add(this.textBoxDocLink);
-            this.groupBoxLink.Controls.Add(this.labelModelsLink);
-            this.groupBoxLink.Controls.Add(this.textBoxModelsLink);
-            this.groupBoxLink.Location = new System.Drawing.Point(16, 348);
-            this.groupBoxLink.Name = "groupBoxLink";
-            this.groupBoxLink.Size = new System.Drawing.Size(512, 165);
-            this.groupBoxLink.TabIndex = 17;
-            this.groupBoxLink.TabStop = false;
+            this.groupBoxOptional.Controls.Add(this.labelApiKeyLink);
+            this.groupBoxOptional.Controls.Add(this.labelDocLink);
+            this.groupBoxOptional.Controls.Add(this.textBoxApiKeyLink);
+            this.groupBoxOptional.Controls.Add(this.textBoxDocLink);
+            this.groupBoxOptional.Controls.Add(this.labelModelsLink);
+            this.groupBoxOptional.Controls.Add(this.textBoxModelsLink);
+            this.groupBoxOptional.Location = new System.Drawing.Point(16, 398);
+            this.groupBoxOptional.Name = "groupBoxOptional";
+            this.groupBoxOptional.Size = new System.Drawing.Size(512, 165);
+            this.groupBoxOptional.TabIndex = 17;
+            this.groupBoxOptional.TabStop = false;
+            this.groupBoxOptional.Text = "Optional option(s)";
             // 
-            // groupBoxModel
+            // groupBoxRecommended
             // 
-            this.groupBoxModel.Controls.Add(this.labelDefaultModel);
-            this.groupBoxModel.Controls.Add(this.textBoxModelList);
-            this.groupBoxModel.Controls.Add(this.labelModelList);
-            this.groupBoxModel.Controls.Add(this.textBoxDefaultModel);
-            this.groupBoxModel.Location = new System.Drawing.Point(16, 218);
-            this.groupBoxModel.Name = "groupBoxModel";
-            this.groupBoxModel.Size = new System.Drawing.Size(512, 122);
-            this.groupBoxModel.TabIndex = 12;
-            this.groupBoxModel.TabStop = false;
+            this.groupBoxRecommended.Controls.Add(this.labelDefaultModel);
+            this.groupBoxRecommended.Controls.Add(this.textBoxModelList);
+            this.groupBoxRecommended.Controls.Add(this.labelModelList);
+            this.groupBoxRecommended.Controls.Add(this.textBoxDefaultModel);
+            this.groupBoxRecommended.Location = new System.Drawing.Point(16, 266);
+            this.groupBoxRecommended.Name = "groupBoxRecommended";
+            this.groupBoxRecommended.Size = new System.Drawing.Size(512, 122);
+            this.groupBoxRecommended.TabIndex = 12;
+            this.groupBoxRecommended.TabStop = false;
+            this.groupBoxRecommended.Text = "Recommended option(s)";
             // 
-            // groupBoxRequest
+            // groupBoxRequired
             // 
-            this.groupBoxRequest.Controls.Add(this.labelBaseURL);
-            this.groupBoxRequest.Controls.Add(this.textBoxBaseURL);
-            this.groupBoxRequest.Controls.Add(this.textBoxPath);
-            this.groupBoxRequest.Controls.Add(this.labelPath);
-            this.groupBoxRequest.Location = new System.Drawing.Point(16, 89);
-            this.groupBoxRequest.Name = "groupBoxRequest";
-            this.groupBoxRequest.Size = new System.Drawing.Size(512, 121);
-            this.groupBoxRequest.TabIndex = 7;
-            this.groupBoxRequest.TabStop = false;
+            this.groupBoxRequired.Controls.Add(this.labelDisplayName);
+            this.groupBoxRequired.Controls.Add(this.textBoxDisplayName);
+            this.groupBoxRequired.Controls.Add(this.labelBaseURL);
+            this.groupBoxRequired.Controls.Add(this.textBoxBaseURL);
+            this.groupBoxRequired.Controls.Add(this.textBoxPath);
+            this.groupBoxRequired.Controls.Add(this.labelPath);
+            this.groupBoxRequired.Location = new System.Drawing.Point(16, 95);
+            this.groupBoxRequired.Name = "groupBoxRequired";
+            this.groupBoxRequired.Size = new System.Drawing.Size(512, 161);
+            this.groupBoxRequired.TabIndex = 5;
+            this.groupBoxRequired.TabStop = false;
+            this.groupBoxRequired.Text = "Required option(s)";
+            // 
+            // labelDisplayName
+            // 
+            this.labelDisplayName.Location = new System.Drawing.Point(9, 33);
+            this.labelDisplayName.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.labelDisplayName.Name = "labelDisplayName";
+            this.labelDisplayName.Size = new System.Drawing.Size(120, 18);
+            this.labelDisplayName.TabIndex = 6;
+            this.labelDisplayName.Text = "Name";
+            // 
+            // textBoxDisplayName
+            // 
+            this.textBoxDisplayName.Location = new System.Drawing.Point(136, 30);
+            this.textBoxDisplayName.Name = "textBoxDisplayName";
+            this.textBoxDisplayName.Size = new System.Drawing.Size(364, 25);
+            this.textBoxDisplayName.TabIndex = 7;
+            this.textBoxDisplayName.LostFocus += new System.EventHandler(this.textBoxDisplayName_LostFocus);
             // 
             // toolTip
             // 
@@ -323,19 +326,17 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.CancelButton = this.buttonCancel;
-            this.ClientSize = new System.Drawing.Size(540, 562);
-            this.Controls.Add(this.groupBoxRequest);
-            this.Controls.Add(this.groupBoxModel);
-            this.Controls.Add(this.groupBoxLink);
+            this.ClientSize = new System.Drawing.Size(540, 621);
+            this.Controls.Add(this.groupBoxRequired);
+            this.Controls.Add(this.groupBoxRecommended);
+            this.Controls.Add(this.groupBoxOptional);
             this.Controls.Add(this.labelAction);
-            this.Controls.Add(this.buttonRename);
             this.Controls.Add(this.buttonDelete);
             this.Controls.Add(this.buttonAdd);
             this.Controls.Add(this.labelProviders);
             this.Controls.Add(this.buttonCancel);
             this.Controls.Add(this.buttonOK);
             this.Controls.Add(this.comboBoxProviders);
-            this.Controls.Add(this.textBoxProvider);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
             this.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             this.MaximizeBox = false;
@@ -346,14 +347,13 @@
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "Custom OpenAI Compatible Providers Manage";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.OpenAICompatibleProvider_FormClosing);
-            this.groupBoxLink.ResumeLayout(false);
-            this.groupBoxLink.PerformLayout();
-            this.groupBoxModel.ResumeLayout(false);
-            this.groupBoxModel.PerformLayout();
-            this.groupBoxRequest.ResumeLayout(false);
-            this.groupBoxRequest.PerformLayout();
+            this.groupBoxOptional.ResumeLayout(false);
+            this.groupBoxOptional.PerformLayout();
+            this.groupBoxRecommended.ResumeLayout(false);
+            this.groupBoxRecommended.PerformLayout();
+            this.groupBoxRequired.ResumeLayout(false);
+            this.groupBoxRequired.PerformLayout();
             this.ResumeLayout(false);
-            this.PerformLayout();
 
         }
 
@@ -364,8 +364,6 @@
         private System.Windows.Forms.Label labelProviders;
         private System.Windows.Forms.Button buttonAdd;
         private System.Windows.Forms.Button buttonDelete;
-        private System.Windows.Forms.Button buttonRename;
-        private System.Windows.Forms.TextBox textBoxProvider;
         private System.Windows.Forms.Label labelAction;
         private System.Windows.Forms.TextBox textBoxApiKeyLink;
         private System.Windows.Forms.TextBox textBoxBaseURL;
@@ -381,9 +379,11 @@
         private System.Windows.Forms.Label labelModelsLink;
         private System.Windows.Forms.Label labelApiKeyLink;
         private System.Windows.Forms.Label labelDocLink;
-        private System.Windows.Forms.GroupBox groupBoxLink;
-        private System.Windows.Forms.GroupBox groupBoxModel;
-        private System.Windows.Forms.GroupBox groupBoxRequest;
+        private System.Windows.Forms.GroupBox groupBoxOptional;
+        private System.Windows.Forms.GroupBox groupBoxRecommended;
+        private System.Windows.Forms.GroupBox groupBoxRequired;
         private System.Windows.Forms.ToolTip toolTip;
+        private System.Windows.Forms.TextBox textBoxDisplayName;
+        private System.Windows.Forms.Label labelDisplayName;
     }
 }

@@ -91,7 +91,7 @@
 	  <Compile Update="Forms\RequestTypeLimit.cs">
 	    <SubType>Form</SubType>
 	  </Compile>
-	  <Compile Update="ProvidersCommon\Forms\LLM\BathTranslate.cs">
+	  <Compile Update="ProvidersCommon\Forms\LLM\BatchTranslate.cs">
 	    <SubType>Form</SubType>
 	  </Compile>
 	  <Compile Update="Forms\OpenAICompatibleProvider.cs" />

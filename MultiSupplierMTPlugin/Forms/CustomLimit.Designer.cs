@@ -40,7 +40,7 @@
             this.tabPageSizeLimit = new System.Windows.Forms.TabPage();
             this.labelMaxCharactersPerRequest = new System.Windows.Forms.Label();
             this.numericUpDownMaxCharactersPerRequest = new System.Windows.Forms.NumericUpDown();
-            this.labelNoBathTip = new System.Windows.Forms.Label();
+            this.labelNoBatchTip = new System.Windows.Forms.Label();
             this.tabPageRateLimit = new System.Windows.Forms.TabPage();
             this.labelWindowSizeMs = new System.Windows.Forms.Label();
             this.labelMaxRequestsPerWindow = new System.Windows.Forms.Label();
@@ -186,7 +186,7 @@
             // 
             this.tabPageSizeLimit.Controls.Add(this.labelMaxCharactersPerRequest);
             this.tabPageSizeLimit.Controls.Add(this.numericUpDownMaxCharactersPerRequest);
-            this.tabPageSizeLimit.Controls.Add(this.labelNoBathTip);
+            this.tabPageSizeLimit.Controls.Add(this.labelNoBatchTip);
             this.tabPageSizeLimit.Controls.Add(this.labelMaxSegmentsPerRequest);
             this.tabPageSizeLimit.Controls.Add(this.numericUpDownMaxSegmentsPerRequest);
             this.tabPageSizeLimit.Location = new System.Drawing.Point(4, 25);
@@ -224,16 +224,16 @@
             this.numericUpDownMaxCharactersPerRequest.Size = new System.Drawing.Size(147, 25);
             this.numericUpDownMaxCharactersPerRequest.TabIndex = 4;
             // 
-            // labelNoBathTip
+            // labelNoBatchTip
             // 
-            this.labelNoBathTip.AutoSize = true;
-            this.labelNoBathTip.ForeColor = System.Drawing.Color.Red;
-            this.labelNoBathTip.Location = new System.Drawing.Point(7, 87);
-            this.labelNoBathTip.Name = "labelNoBathTip";
-            this.labelNoBathTip.Size = new System.Drawing.Size(407, 15);
-            this.labelNoBathTip.TabIndex = 5;
-            this.labelNoBathTip.Text = "Selected provider no supported  batch translation!";
-            this.labelNoBathTip.Visible = false;
+            this.labelNoBatchTip.AutoSize = true;
+            this.labelNoBatchTip.ForeColor = System.Drawing.Color.Red;
+            this.labelNoBatchTip.Location = new System.Drawing.Point(7, 87);
+            this.labelNoBatchTip.Name = "labelNoBatchTip";
+            this.labelNoBatchTip.Size = new System.Drawing.Size(407, 15);
+            this.labelNoBatchTip.TabIndex = 5;
+            this.labelNoBatchTip.Text = "Selected provider no supported  batch translation!";
+            this.labelNoBatchTip.Visible = false;
             // 
             // tabPageRateLimit
             // 
@@ -500,7 +500,7 @@
         private System.Windows.Forms.Label labelMaxRequestsPerWindow;
         private System.Windows.Forms.Label labelMaxRequestsHold;
         private System.Windows.Forms.Button buttonLoadProviderDefault;
-        private System.Windows.Forms.Label labelNoBathTip;
+        private System.Windows.Forms.Label labelNoBatchTip;
         private System.Windows.Forms.Label labelMaxCharactersPerRequest;
         private System.Windows.Forms.NumericUpDown numericUpDownMaxCharactersPerRequest;
         private System.Windows.Forms.ToolTip toolTip;
