@@ -3,6 +3,8 @@
 		<!-- 选择性嵌入 -->
 		<IncludeAssemblies>
 			LiteDB
+			Snowball
+			Bbieniek.Uax29
 			NReco.Text.AhoCorasickDoubleArrayTrie
 		</IncludeAssemblies>
 

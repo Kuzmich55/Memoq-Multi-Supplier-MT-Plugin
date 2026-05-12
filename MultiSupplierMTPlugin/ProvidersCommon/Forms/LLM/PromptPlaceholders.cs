@@ -119,7 +119,7 @@ namespace MultiSupplierMTPlugin.ProvidersCommon.Forms.LLM
 
         private void buttonGlossarySelect_Click(object sender, EventArgs e)
         {
-            openFileDialog.Filter = "All Supported Formats|*.txt;*.csv;";
+            openFileDialog.Filter = "MemoQ or DeepL CSV|*.csv|MemoQ or DeepL TXT|*.txt|All Supported Formats|*.csv;*.txt;";
 
             openFileDialog.FileName = "";
 

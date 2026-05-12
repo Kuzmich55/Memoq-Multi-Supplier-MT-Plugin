@@ -1,11 +1,12 @@
-﻿using System;
+﻿using Bbieniek.Uax29;
+using NReco.Text;
+using Snowball;
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
-using NReco.Text;
 
 namespace MultiSupplierMTPlugin.Helpers
 {
@@ -16,59 +17,77 @@ namespace MultiSupplierMTPlugin.Helpers
         private const string _SOURCE_LANGUAGE_FIELD = "SourceLanguage";
         private const string _TARGET_LANGUAGE_FIELD = "TargetLanguage";
 
-        private static readonly ConcurrentDictionary<string, AhoCorasickDoubleArrayTrie<KeyValuePair<string, string>>> _automataCache = 
-            new ConcurrentDictionary<string, AhoCorasickDoubleArrayTrie<KeyValuePair<string, string>>>();
+        private const string _ANY_SOURCE_LANGUAGE = "AnySourceLanguage";
+        private const string _ANY_TARGET_LANGUAGE = "AnyTargetLanguage";
 
+        private static readonly ConcurrentDictionary<string, Matcher> _matcherCache
+            = new ConcurrentDictionary<string, Matcher>();
 
-        public static string ReadGlossaryString(List<string> plainTexts, string path, string srcLang, string tgtLang, string delimiter = ",", string charset = "utf-8", bool enableCache = true)
+        #region Public Methods
+
+        public static string ReadGlossaryString(List<string> plainTexts, string path, string srcLang, string tgtLang,
+            string delimiter = ",", string charset = "utf-8", bool enableCache = true)
         {
             var termPairs = ReadGlossaryPairs(plainTexts, path, srcLang, tgtLang, delimiter, charset, enableCache);
-
-            return string.Join(Environment.NewLine, termPairs.Select(termPair => $"{termPair.Key}\t{termPair.Value}"));
+            return string.Join(Environment.NewLine, termPairs.Select(tp => $"{tp.Key}\t{tp.Value}"));
         }
 
-        public static HashSet<KeyValuePair<string, string>> ReadGlossaryPairs(List<string> plainTexts, string path, string srcLang, string tgtLang, string delimiter = ",", string charset = "utf-8", bool enableCache = true)
+        public static HashSet<KeyValuePair<string, string>> ReadGlossaryPairs(List<string> plainTexts, string path,
+            string srcLang, string tgtLang, string delimiter = ",", string charset = "utf-8", bool enableCache = true)
         {
-            var result = new HashSet<KeyValuePair<string, string>>();
+            var matcher = GetOrCreateMatcher(path, srcLang, tgtLang, delimiter, charset, enableCache);
 
-            var automata = GetOrCreateAutomata(path, srcLang, tgtLang, delimiter, charset, enableCache);                       
-            automata.ParseText(string.Join("", plainTexts), (hit) => { result.Add(hit.Value); });
+            string matchString = string.Join("", plainTexts);
+            if (matcher.Stemmer != null && matcher.WordEncoder != null)
+            {
+                var words = Tokenize(matchString, matcher.Stemmer);
+                matchString = matcher.WordEncoder.EncodeForQuery(words);
+            }
+
+            var result = new HashSet<KeyValuePair<string, string>>();
+            matcher.Automata.ParseText(matchString, hit =>
+            {
+                var concept = hit.Value.Concept;
+
+                foreach (var langCode in new[] { tgtLang, _ANY_TARGET_LANGUAGE })
+                {
+                    if (!concept.TermDic.ContainsKey(langCode)) continue;
+
+                    foreach (var targetTerm in concept.TermDic[langCode])
+                    {
+                        result.Add(new KeyValuePair<string, string>(hit.Value.SourceTerm, targetTerm));
+                    }
+                }
+            });
+
+            //LoggingHelper.Info($"Matched {result.Count} term(s) from the glossary");
 
             return result;
         }
 
+        #endregion
 
-        private static AhoCorasickDoubleArrayTrie<KeyValuePair<string, string>> GetOrCreateAutomata(string path, string srcLang, string tgtLang, string delimiter = ",", string charset = "utf-8", bool enableCache = true)
+        #region Tokenize
+
+        private static List<string> Tokenize(string text, Stemmer stemmer = null)
         {
-            string key = GetKey(path, srcLang, tgtLang, delimiter, charset);
+            var tokens = new List<string>();
 
-            if (enableCache)
+            foreach (var token in WordBreakTokenizer.Tokenize(text))
             {
-                if (_automataCache.TryGetValue(key, out var cachedAutomata))
-                {
-                    LoggingHelper.Info($"Glossary load from memory");
+                var tokenValue = text.Substring(token.Start, token.Length);
 
-                    return cachedAutomata;
-                }
+                tokens.Add(stemmer != null && token.IsWord ? stemmer.Stem(tokenValue) : tokenValue);
             }
 
-            var termPairs = ReadGlossaryPairsFromFile(path, srcLang, tgtLang, delimiter, charset);
-            LoggingHelper.Info($"Glossary load from disk");
-            
-            var automata = new AhoCorasickDoubleArrayTrie<KeyValuePair<string, string>>(
-                termPairs.Select(tp => new KeyValuePair<string, KeyValuePair<string, string>>(tp.Key, tp)), 
-                true
-            );
-
-            if (enableCache)
-            {
-                _automataCache[key] = automata;
-            }
-
-            return automata;
+            return tokens;
         }
 
-        private static string GetKey(string path, string srcLang, string tgtLang, string delimiter, string charset)
+        #endregion
+
+        #region Matcher
+
+        private static string GetMatcherCacheKey(string path, string srcLang, string tgtLang, string delimiter, string charset)
         {
             string modificationTime;
             try
@@ -77,724 +96,571 @@ namespace MultiSupplierMTPlugin.Helpers
             }
             catch
             {
-                throw new Exception($"glossary file does not exist: {path}");
+                throw new Exception($"Glossary file does not exist: {path}");
             }
             return $"{path}|{modificationTime}|{srcLang}|{tgtLang}|{delimiter}|{charset}";
         }
 
-        private static HashSet<KeyValuePair<string, string>> ReadGlossaryPairsFromFile(string path, string srcLang, string tgtLang, string delimiter = ",", string charset = "utf-8")
+        private static Matcher GetOrCreateMatcher(string path, string srcLang, string tgtLang,
+           string delimiter = ",", string charset = "utf-8", bool enableCache = true)
         {
-            var result = new HashSet<KeyValuePair<string, string>>();
+            string key = GetMatcherCacheKey(path, srcLang, tgtLang, delimiter, charset);
 
+            if (enableCache && _matcherCache.TryGetValue(key, out var cachedMatcher))
+            {
+                LoggingHelper.Info("Glossary load from cache done");
+                return cachedMatcher;
+            }
+
+            bool hasStemmer = StemmerFactory.TryGet(srcLang, out var stemmer);
+            WordEncoder wordEncoder = hasStemmer ? new WordEncoder(true) : null;
+
+            var entries = new List<KeyValuePair<string, TermHit>>();
+            var concepts = ReadGlossaryConceptsFromFile(path, delimiter, charset, new HashSet<string>() { srcLang, tgtLang });
+            foreach (var concept in concepts)
+            {
+                foreach (var langCode in new[] { srcLang, _ANY_SOURCE_LANGUAGE })
+                {
+                    if (!concept.TermDic.ContainsKey(langCode)) continue;
+
+                    foreach (var srcTerm in concept.TermDic[langCode])
+                    {
+                        string matchString = srcTerm;
+                        if (stemmer != null && wordEncoder != null)
+                        {
+                            var words = Tokenize(srcTerm, stemmer);
+                            matchString = wordEncoder.EncodeForBuild(words);
+                        }
+
+                        var termHit = new TermHit { SourceTerm = srcTerm, Concept = concept };
+
+                        entries.Add(new KeyValuePair<string, TermHit>(matchString, termHit));
+                    }
+                }
+            }
+
+            var matcher = new Matcher()
+            {
+                Stemmer = stemmer,
+                WordEncoder = wordEncoder,
+                Automata = new AhoCorasickDoubleArrayTrie<TermHit>(entries),
+            };
+
+            if (enableCache)
+            {
+                _matcherCache[key] = matcher;
+            }
+
+            LoggingHelper.Info("Glossary load from disk done");
+            return matcher;
+        }
+
+        #endregion
+
+        #region File Parsing
+
+        private static List<Concept> ReadGlossaryConceptsFromFile(string path, string delimiter = ",", string charset = "utf-8", HashSet<string> includeLangs = null)
+        {
             using (var parser = new CsvTextFieldParser(path, Encoding.GetEncoding(charset)))
             {
-                // 分隔符和字段顺序
-                char detectedSeparator = delimiter[0];
-                Dictionary<string, int> fieldIndices = new Dictionary<string, int>();
-
-                // 解析器配置
-                //parser.Delimiters = new[] { "|" };
-                parser.SetDelimiter(detectedSeparator);
+                parser.SetDelimiter(delimiter[0]);
                 parser.SetQuoteCharacter('"');
                 parser.SetQuoteEscapeCharacter('"');
                 parser.HasFieldsEnclosedInQuotes = true;
                 parser.TrimWhiteSpace = true;
 
                 if (parser.EndOfData)
-                {
-                    return result;
-                }
+                    throw new Exception("Empty glossary file");
 
-                // 第一行
                 string[] firstLineFields = parser.ReadFields();
+                var format = DetectFormat(firstLineFields);
 
-                // 尝试将第一行当作表头（忽略大小写）
-                for (int i = 0; i < firstLineFields.Length; i++)
+                LoggingHelper.Info($"Detected glossary format is: {format.ToString()}");
+
+                var concepts = format == GlossaryFormat.MemoQCsv
+                    ? ParseMemoQFormat(parser, firstLineFields, includeLangs)
+                    : ParseDeepLFormat(parser, firstLineFields, includeLangs);
+
+                LoggingHelper.Info($"Obtain {concepts.Count} concept(s) from the glossary file");                
+
+                return concepts;
+            }
+        }
+
+        private static GlossaryFormat DetectFormat(string[] firstLineFields)
+        {
+            int memoQLangCount = firstLineFields
+                .Where(field => LanguageHelper.GlossaryFieldNameToCodeDic.ContainsKey(field))
+                .Distinct(StringComparer.OrdinalIgnoreCase)
+                .Count();
+
+            return memoQLangCount >= 2 ? GlossaryFormat.MemoQCsv : GlossaryFormat.DeepLCsv;
+        }
+
+        #endregion
+
+        #region MemoQ Format
+
+        private static List<Concept> ParseMemoQFormat(CsvTextFieldParser parser, string[] firstLineFields, HashSet<string> includeLangs = null)
+        {
+            var concepts = new List<Concept>();
+
+            // 收集语言列
+            var langIndicesDic = new Dictionary<string, List<int>>(StringComparer.OrdinalIgnoreCase);
+            for (int i = 0; i < firstLineFields.Length; i++)
+            {
+                if (LanguageHelper.GlossaryFieldNameToCodeDic.TryGetValue(firstLineFields[i], out string langCode))
                 {
-                    string field = firstLineFields[i];
+                    // 过滤掉不需要的语言
+                    if (includeLangs != null && !includeLangs.Contains(langCode))
+                        continue;
 
-                    if (field.Equals(_SOURCE_TERM_FIELD, StringComparison.OrdinalIgnoreCase))
-                        fieldIndices[_SOURCE_TERM_FIELD] = i;
-                    else if (field.Equals(_TARGET_TERM_FIELD, StringComparison.OrdinalIgnoreCase))
-                        fieldIndices[_TARGET_TERM_FIELD] = i;
-                    else if (field.Equals(_SOURCE_LANGUAGE_FIELD, StringComparison.OrdinalIgnoreCase))
-                        fieldIndices[_SOURCE_LANGUAGE_FIELD] = i;
-                    else if (field.Equals(_TARGET_LANGUAGE_FIELD, StringComparison.OrdinalIgnoreCase))
-                        fieldIndices[_TARGET_LANGUAGE_FIELD] = i;
+                    LoggingHelper.Info($"Detected '{firstLineFields[i]}' in column {i + 1} from the glossary file");
+
+                    if (!langIndicesDic.ContainsKey(langCode))
+                        langIndicesDic[langCode] = new List<int>();
+
+                    langIndicesDic[langCode].Add(i);
+                }
+            }
+
+            while (!parser.EndOfData)
+            {
+                string[] fields = parser.ReadFields();
+                var concept = new Concept { TermDic = new Dictionary<string, HashSet<string>>() };
+
+                foreach (var kv in langIndicesDic)
+                {
+                    string langCode = kv.Key;
+                    List<int> indices = kv.Value;
+
+                    var terms = indices
+                        .Where(idx => idx < fields.Length && !string.IsNullOrEmpty(fields[idx]))
+                        .Select(idx => fields[idx])
+                        .ToHashSet();
+
+                    if (terms.Any())
+                        concept.TermDic[langCode] = terms;
                 }
 
-                // 第一行不是表头，使用默认表头，并将第一行当作数据行处理
-                if (!fieldIndices.ContainsKey(_SOURCE_TERM_FIELD) || !fieldIndices.ContainsKey(_TARGET_TERM_FIELD))
-                {                    
-                    fieldIndices[_SOURCE_TERM_FIELD] = 0;
-                    fieldIndices[_TARGET_TERM_FIELD] = 1;
-                    fieldIndices[_SOURCE_LANGUAGE_FIELD] = 2;
-                    fieldIndices[_TARGET_LANGUAGE_FIELD] = 3;
-                    
-                    if (TryGetTermPair(firstLineFields, fieldIndices, srcLang, tgtLang, out var termPair))
+                if (concept.TermDic.Any())
+                    concepts.Add(concept);
+            }
+
+            return concepts;
+        }
+
+        #endregion
+
+        #region DeepL Format
+
+        private static List<Concept> ParseDeepLFormat(CsvTextFieldParser parser, string[] firstLineFields, HashSet<string> includeLangs = null)
+        {
+            var indices = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+            for (int i = 0; i < firstLineFields.Length; i++)
+            {
+                string f = firstLineFields[i];
+                if (f.Equals(_SOURCE_TERM_FIELD, StringComparison.OrdinalIgnoreCase)) indices[_SOURCE_TERM_FIELD] = i;
+                else if (f.Equals(_TARGET_TERM_FIELD, StringComparison.OrdinalIgnoreCase)) indices[_TARGET_TERM_FIELD] = i;
+                else if (f.Equals(_SOURCE_LANGUAGE_FIELD, StringComparison.OrdinalIgnoreCase)) indices[_SOURCE_LANGUAGE_FIELD] = i;
+                else if (f.Equals(_TARGET_LANGUAGE_FIELD, StringComparison.OrdinalIgnoreCase)) indices[_TARGET_LANGUAGE_FIELD] = i;
+            }
+
+            bool hasHeader = indices.ContainsKey(_SOURCE_TERM_FIELD) && indices.ContainsKey(_TARGET_TERM_FIELD);
+
+            LoggingHelper.Info($"Glossary file contains headers: {hasHeader}");
+
+            int srcTermIdx = hasHeader ? indices[_SOURCE_TERM_FIELD] : 0;
+            int tgtTermIdx = hasHeader ? indices[_TARGET_TERM_FIELD] : 1;
+            int srcLangIdx = hasHeader ? (indices.ContainsKey(_SOURCE_LANGUAGE_FIELD) ? indices[_SOURCE_LANGUAGE_FIELD] : -1) : 2;
+            int tgtLangIdx = hasHeader ? (indices.ContainsKey(_TARGET_LANGUAGE_FIELD) ? indices[_TARGET_LANGUAGE_FIELD] : -1) : 3;
+
+            LoggingHelper.Info($"Glossary field index: " +
+                $"{_SOURCE_TERM_FIELD}:{srcTermIdx + 1} {_TARGET_TERM_FIELD}:{tgtTermIdx + 1} " +
+                $"{_SOURCE_LANGUAGE_FIELD}:{srcLangIdx + 1} {_TARGET_LANGUAGE_FIELD}:{tgtLangIdx + 1}");
+
+            var concepts = new List<Concept>();
+
+            if (!hasHeader)
+            {
+                ProcessDeepLRow(srcTermIdx, tgtTermIdx, srcLangIdx, tgtLangIdx, firstLineFields, concepts);
+            }
+
+            while (!parser.EndOfData)
+            {
+                ProcessDeepLRow(srcTermIdx, tgtTermIdx, srcLangIdx, tgtLangIdx, parser.ReadFields(), concepts);
+            }
+
+            if (includeLangs != null)
+            {
+                FilterConceptLanguages(includeLangs, concepts);
+            }
+
+            return concepts;
+        }
+
+        private static void ProcessDeepLRow(int srcTermIdx, int tgtTermIdx, int srcLangIdx, int tgtLangIdx, string[] fields, List<Concept> concepts)
+        {
+            string srcTerm = GetTermOrNull(srcTermIdx, fields);
+            string tgtTerm = GetTermOrNull(tgtTermIdx, fields);
+
+            string srcLang = GetLanguageOrAny(srcLangIdx, fields, true);
+            string tgtLang = GetLanguageOrAny(tgtLangIdx, fields, false);
+
+            // 源术语、目标术语都不存在
+            if (srcTerm == null && tgtTerm == null)
+            {
+                return;
+            }
+
+            // 只有源术语不存在（只存在目标术语）
+            if (srcTerm == null)
+            {
+                if (!IsInAnyConcept(tgtLang, tgtTerm, concepts))
+                {
+                    concepts.Add(CreateConcept(tgtLang, tgtTerm));
+                }
+                return;
+            }
+
+            // 只有目标术语不存在（只存在源术语）
+            if (tgtTerm == null)
+            {
+                if (!IsInAnyConcept(srcLang, srcTerm, concepts))
+                {
+                    concepts.Add(CreateConcept(srcLang, srcTerm));
+                }
+                return;
+            }
+
+            // 同时存在源术语和目标术语，但至少其中一者的语言不存在（语言是 Any*）
+            if (srcLang == _ANY_SOURCE_LANGUAGE || tgtLang == _ANY_TARGET_LANGUAGE)
+            {
+                if (!IsInAnyConcept(srcLang, srcTerm, tgtLang, tgtTerm, concepts))
+                {
+                    concepts.Add(CreateConcept(srcLang, srcTerm, tgtLang, tgtTerm));
+                }
+                return;
+            }
+
+            // 同时存在源术语和目标术语，且两者的语言都存在
+            var conceptContainSrc = FindConceptExcludeAnyLanguage(srcLang, srcTerm, concepts);
+            var conceptContainTgt = FindConceptExcludeAnyLanguage(tgtLang, tgtTerm, concepts);
+            if (conceptContainSrc == null && conceptContainTgt == null)
+            {
+                concepts.Add(CreateConcept(srcLang, srcTerm, tgtLang, tgtTerm));
+            }
+            else if (conceptContainSrc == null && conceptContainTgt != null)
+            {
+                AddTermToConcept(srcLang, srcTerm, conceptContainTgt);
+            }
+            else if (conceptContainSrc != null && conceptContainTgt == null)
+            {
+                AddTermToConcept(tgtLang, tgtTerm, conceptContainSrc);
+            }
+            else if (conceptContainSrc != conceptContainTgt)
+            {
+                MergeConcepts(conceptContainSrc, conceptContainTgt);
+                concepts.Remove(conceptContainSrc);
+            }
+        }
+
+        private static string GetTermOrNull(int index, string[] fields)
+        {
+            return (index < 0 || index >= fields.Length || string.IsNullOrEmpty(fields[index]))
+                ? null
+                : fields[index];
+        }
+
+        private static string GetLanguageOrAny(int index, string[] fields, bool isSource)
+        {
+            return (index < 0 || index >= fields.Length || string.IsNullOrEmpty(fields[index]))
+                    ? (isSource ? _ANY_SOURCE_LANGUAGE : _ANY_TARGET_LANGUAGE)
+                    : fields[index];
+        }
+
+        private static bool IsInAnyConcept(string lang, string term, List<Concept> concepts)
+        {
+            return concepts.Any(c =>
+                   c.TermDic.ContainsKey(lang)
+                && c.TermDic[lang].Contains(term));
+        }
+
+        private static bool IsInAnyConcept(string srcLang, string srcTerm, string tgtLang, string tgtTerm, List<Concept> concepts)
+        {
+            return concepts.Any(c =>
+                   c.TermDic.ContainsKey(srcLang)
+                && c.TermDic.ContainsKey(tgtLang)
+                && c.TermDic[srcLang].Contains(srcTerm)
+                && c.TermDic[tgtLang].Contains(tgtTerm));
+        }
+
+        private static Concept CreateConcept(string lang, string term)
+        {
+            var termDic = new Dictionary<string, HashSet<string>>();
+            termDic[lang] = new HashSet<string> { term };
+
+            return new Concept { TermDic = termDic };
+        }
+
+        private static Concept CreateConcept(string srcLang, string srcTerm, string tgtLang, string tgtTerm)
+        {
+            var termDic = new Dictionary<string, HashSet<string>>();
+            termDic[srcLang] = new HashSet<string> { srcTerm };
+            termDic[tgtLang] = new HashSet<string> { tgtTerm };
+
+            return new Concept { TermDic = termDic };
+        }
+
+        private static Concept FindConceptExcludeAnyLanguage(string lang, string term, List<Concept> concepts)
+        {
+            return concepts.FirstOrDefault(c =>
+                   !c.TermDic.ContainsKey(_ANY_SOURCE_LANGUAGE)
+                && !c.TermDic.ContainsKey(_ANY_TARGET_LANGUAGE)
+                && c.TermDic.ContainsKey(lang) && c.TermDic[lang].Contains(term));
+        }
+
+        private static void AddTermToConcept(string lang, string term, Concept concept)
+        {
+            if (!concept.TermDic.ContainsKey(lang))
+                concept.TermDic[lang] = new HashSet<string>();
+
+            concept.TermDic[lang].Add(term);
+        }
+
+        private static void MergeConcepts(Concept from, Concept to)
+        {
+            foreach (var kv in from.TermDic)
+            {
+                if (!to.TermDic.ContainsKey(kv.Key))
+                    to.TermDic[kv.Key] = new HashSet<string>();
+
+                foreach (var term in kv.Value)
+                    to.TermDic[kv.Key].Add(term);
+            }
+        }
+
+        private static void FilterConceptLanguages(HashSet<string> includeLangs, List<Concept> concepts)
+        {
+            foreach (var concept in concepts)
+            {
+                var toRemove = concept.TermDic.Keys
+                    .Where(lang => lang != _ANY_SOURCE_LANGUAGE
+                                && lang != _ANY_TARGET_LANGUAGE
+                                && !includeLangs.Contains(lang))
+                    .ToList();
+
+                foreach (var lang in toRemove)
+                    concept.TermDic.Remove(lang);
+            }
+        }
+
+        #endregion
+
+        #region Data Structures
+
+        private class Matcher
+        {
+            public Stemmer Stemmer { get; set; }
+
+            public WordEncoder WordEncoder { get; set; }
+
+            public AhoCorasickDoubleArrayTrie<TermHit> Automata { get; set; }
+        }
+
+        private class WordEncoder
+        {
+            private int _nextId = 1; // 0 保留给未知词
+            private readonly Dictionary<string, char> _wordIdDic;
+
+            public WordEncoder(bool ignoreCase = false)
+            {
+                _wordIdDic = ignoreCase
+                    ? new Dictionary<string, char>(StringComparer.OrdinalIgnoreCase)
+                    : new Dictionary<string, char>();
+            }
+
+            public string EncodeForBuild(List<string> words)
+            {
+                var sb = new StringBuilder();
+
+                foreach (var word in words)
+                {
+                    if (_wordIdDic.TryGetValue(word, out char id))
                     {
-                        result.Add(termPair);
-                    }
-                }
-
-                // 读取剩余数据
-                while (!parser.EndOfData)
-                {
-                    string[] fields = parser.ReadFields();
-                    if (TryGetTermPair(fields, fieldIndices, srcLang, tgtLang, out var termPair))
-                    {
-                        result.Add(termPair);
-                    }
-                }
-            }
-
-            return result;
-        }
-
-        private static bool TryGetTermPair(string[] fields, Dictionary<string, int> fieldIndices, string srcLang, string tgtLang, out KeyValuePair<string, string> result)
-        {
-            if (fieldIndices.ContainsKey(_SOURCE_TERM_FIELD) && fieldIndices[_SOURCE_TERM_FIELD] < fields.Length &&
-                fieldIndices.ContainsKey(_TARGET_TERM_FIELD) && fieldIndices[_TARGET_TERM_FIELD] < fields.Length)
-            {
-                string sourceTerm = fields[fieldIndices[_SOURCE_TERM_FIELD]];
-                string targetTerm = fields[fieldIndices[_TARGET_TERM_FIELD]];
-
-                bool includeTerms = true;
-
-                if (fieldIndices.ContainsKey(_SOURCE_LANGUAGE_FIELD) && fieldIndices[_SOURCE_LANGUAGE_FIELD] < fields.Length)
-                {
-                    string sourceLanguage = fields[fieldIndices[_SOURCE_LANGUAGE_FIELD]];
-                    includeTerms = string.IsNullOrWhiteSpace(sourceLanguage) || srcLang.Equals(sourceLanguage, StringComparison.OrdinalIgnoreCase);
-                }
-
-                if (includeTerms && fieldIndices.ContainsKey(_TARGET_LANGUAGE_FIELD) && fieldIndices[_TARGET_LANGUAGE_FIELD] < fields.Length)
-                {
-                    string targetLanguage = fields[fieldIndices[_TARGET_LANGUAGE_FIELD]];
-                    includeTerms = string.IsNullOrWhiteSpace(targetLanguage) || tgtLang.Equals(targetLanguage, StringComparison.OrdinalIgnoreCase);
-                }
-
-                if (includeTerms)
-                {
-                    result = new KeyValuePair<string, string>(sourceTerm, targetTerm);
-                    return true;
-                }
-            }
-
-            result = default;
-            return false;
-        }
-    }
-
-
-    /// <summary>
-    /// Parses comma-delimited text files.
-    /// </summary>
-    /// <remarks>
-    /// Designed for compatibility with Microsoft.VisualBasic.FileIO.TextFieldParser.
-    /// https://github.com/22222/CsvTextFieldParser/blob/master/CsvTextFieldParser/CsvTextFieldParser.cs
-    /// </remarks>
-    class CsvTextFieldParser : IDisposable
-    {
-        private TextReader reader;
-        private string peekedLine = null;
-        private int peekedEmptyLineCount = 0;
-        private long lineNumber = 0;
-
-        private char delimiterChar = ',';
-        private char quoteChar = '"';
-        private char quoteEscapeChar = '"';
-
-        /// <summary>
-        /// Constructs a parser from the specified input stream.
-        /// </summary>
-        public CsvTextFieldParser(Stream stream)
-            : this(new StreamReader(stream)) { }
-
-        /// <summary>
-        /// Constructs a parser from the specified input stream with the specified encoding.
-        /// </summary>
-        public CsvTextFieldParser(Stream stream, Encoding encoding)
-            : this(new StreamReader(stream, encoding)) { }
-
-        /// <summary>
-        /// Constructs a parser from the specified input stream with the specified encoding and byte order mark detection option.
-        /// </summary>
-        public CsvTextFieldParser(Stream stream, Encoding encoding, bool detectEncodingFromByteOrderMarks)
-            : this(new StreamReader(stream, encoding, detectEncodingFromByteOrderMarks)) { }
-
-        /// <summary>
-        /// Constructs a parser from the specified input stream with the specified encoding and byte order mark detection option, and optionally leaves the stream open.
-        /// </summary>
-        public CsvTextFieldParser(Stream stream, Encoding encoding, bool detectEncodingFromByteOrderMarks, bool leaveOpen)
-            : this(new StreamReader(stream, encoding, detectEncodingFromByteOrderMarks, 1024, leaveOpen)) { }
-
-        /// <summary>
-        /// Constructs a parser from the specified input file path.
-        /// </summary>
-        public CsvTextFieldParser(string path)
-            : this(new StreamReader(path)) { }
-
-        /// <summary>
-        /// Constructs a parser from the specified input file path with the specified encoding.
-        /// </summary>
-        public CsvTextFieldParser(string path, Encoding encoding)
-            : this(new StreamReader(path, encoding)) { }
-
-        /// <summary>
-        /// Constructs a parser from the specified input file path with the specified encoding and byte order mark detection option.
-        /// </summary>
-        public CsvTextFieldParser(string path, Encoding encoding, bool detectEncodingFromByteOrderMarks)
-            : this(new StreamReader(path, encoding, detectEncodingFromByteOrderMarks)) { }
-
-        /// <summary>
-        /// Constructs a parser from the specified input text reader.
-        /// </summary>
-        public CsvTextFieldParser(TextReader reader)
-        {
-            if (reader == null) throw new ArgumentNullException(nameof(reader));
-            this.reader = reader;
-        }
-
-        /// <summary>
-        /// True if there are non-empty lines between the current cursor position and the end of the file.
-        /// </summary>
-        public bool EndOfData => !HasNextLine();
-
-        /// <summary>
-        /// Reads all fields on the current line, returns them as an array of strings, and advances the cursor to the next line containing data.
-        /// </summary>
-        /// <returns>An array of strings that contains field values for the current line, or null if <see cref="EndOfData"/> is true.</returns>
-        /// <exception cref="CsvMalformedLineException">if the parse of the current line failed</exception>
-        public string[] ReadFields()
-        {
-            if (reader == null) return null;
-
-            var line = ReadNextLineWithTrailingEol(ignoreEmptyLines: true);
-            if (line == null)
-            {
-                return null;
-            }
-
-            var fields = new List<string>();
-            int startIndex = 0;
-            while (startIndex < line.Length)
-            {
-                int nextStartIndex;
-                fields.Add(ParseField(ref line, startIndex, out nextStartIndex));
-                startIndex = nextStartIndex;
-            }
-
-            // If the last char is the delimiter, then we need to add an extra empty field.
-            if (line.Length == 0 || line[line.Length - 1] == delimiterChar)
-            {
-                fields.Add(string.Empty);
-            }
-
-            return fields.ToArray();
-        }
-
-        private string ParseField(ref string line, int startIndex, out int nextStartIndex)
-        {
-            if (HasFieldsEnclosedInQuotes && line[startIndex] == quoteChar)
-            {
-                return ParseFieldAfterOpeningQuote(ref line, startIndex + 1, out nextStartIndex);
-            }
-            if ((CompatibilityMode || TrimWhiteSpace) && HasFieldsEnclosedInQuotes && char.IsWhiteSpace(line[startIndex]) && line[startIndex] != delimiterChar)
-            {
-                int leadingWhitespaceCount = line.Skip(startIndex).TakeWhile(ch => char.IsWhiteSpace(ch) && ch != delimiterChar).Count();
-                int nonWhitespaceStartIndex = startIndex + leadingWhitespaceCount;
-                if (nonWhitespaceStartIndex < line.Length && line[nonWhitespaceStartIndex] == quoteChar)
-                {
-                    return ParseFieldAfterOpeningQuote(ref line, nonWhitespaceStartIndex + 1, out nextStartIndex);
-                }
-            }
-
-            string field;
-            var delimiterIndex = line.IndexOf(delimiterChar, startIndex);
-            if (delimiterIndex >= 0)
-            {
-                field = line.Substring(startIndex, delimiterIndex - startIndex);
-                nextStartIndex = delimiterIndex + 1;
-            }
-            else
-            {
-                field = line.Substring(startIndex).TrimEnd('\r', '\n');
-                nextStartIndex = line.Length;
-            }
-            if (TrimWhiteSpace)
-            {
-                field = field.Trim();
-            }
-            return field;
-        }
-
-        private string ParseFieldAfterOpeningQuote(ref string line, int startIndex, out int nextStartIndex)
-        {
-            var sb = new StringBuilder();
-            long currentLineNumber = lineNumber;
-            int i = startIndex;
-            bool isQuoteClosed = false;
-
-            do
-            {
-                while (i < line.Length)
-                {
-                    // If we have the escape char and then a quote (or another escape char),
-                    // then we need to skip the escape char and just add the char it was escaping.
-                    if (line[i] == quoteEscapeChar && i + 1 < line.Length && (line[i + 1] == quoteChar || line[i + 1] == quoteEscapeChar))
-                    {
-                        sb.Append(line[i + 1]);
-                        i += 2;
+                        sb.Append(id);
                         continue;
                     }
 
-                    // If we have an (unescaped) quote char, then we're done parsing this field.
-                    if (line[i] == quoteChar)
+                    _nextId++;
+                    if (_nextId > 65535)
+                        throw new Exception("WordEncoder exceed the value, range 0 ~ 65535");
+
+                    id = (char)_nextId;
+                    _wordIdDic[word] = id;
+
+                    sb.Append(id);
+                }
+
+                return sb.ToString();
+            }
+
+            public string EncodeForQuery(List<string> words)
+            {
+                var sb = new StringBuilder();
+
+                foreach (var word in words)
+                {
+                    if (_wordIdDic.TryGetValue(word, out char id))
                     {
-                        isQuoteClosed = true;
-                        i++;
-                        break;
+                        sb.Append(id);
+                        continue;
                     }
 
-                    sb.Append(line[i]);
-                    i++;
+                    sb.Append((char)0);
                 }
 
-                // If the quote is still open and we've read through the entire line, then the field value might contain an EOL character.
-                // That means we need to add the next line to our input and continue parsing this field.
-                if (!isQuoteClosed && i >= line.Length)
-                {
-                    // Ignoring empty lines is the wrong thing to do here (we'd be stripping out EOL characters in the middle of a quoted field).
-                    // But that's how the VB version works, so we'll do the same in compatibility mode.
-                    string nextLine = ReadNextLineWithTrailingEol(ignoreEmptyLines: CompatibilityMode);
-                    if (nextLine == null)
-                    {
-                        // If we're out of lines and still haven't found a closing quote, then this whole line is malformed.
-                        throw CreateMalformedLineException(
-                            message: $"Line {currentLineNumber} cannot be parsed because a quoted field is not closed.",
-                            errorLine: line.TrimEnd('\r', '\n'),
-                            errorLineNumber: currentLineNumber
-                        );
-                    }
-                    line += nextLine;
-                }
-            } while (!isQuoteClosed && i < line.Length);
-
-            // A line can be considered malformed if there are extra characters after the closing quote.
-            bool isMalformed;
-            if (isQuoteClosed)
-            {
-                if (i >= line.Length)
-                {
-                    isMalformed = false;
-                }
-                else if (line[i] == delimiterChar)
-                {
-                    isMalformed = false;
-                }
-                else if (line[i] == '\r' || line[i] == '\n')
-                {
-                    // If the field ends in an EOL character, then we need to increment past it
-                    if (line[i] == '\r' && i + 1 < line.Length && line[i + 1] == '\n')
-                    {
-                        i++;
-                    }
-                    i++;
-                    isMalformed = false;
-                }
-                else if ((CompatibilityMode || TrimWhiteSpace) && char.IsWhiteSpace(line[i]) && line[i] != delimiterChar)
-                {
-                    isMalformed = true;
-
-                    // The VB parser allows extra whitespace after the closing quote.
-                    // And if that happens at the end of the file, this causes an extra blank space to be added.
-                    int nextDelimiterOrEolIndex = line.IndexOfAny(new char[] { delimiterChar, '\r', '\n' }, i);
-                    int remainingFieldLength = (nextDelimiterOrEolIndex >= 0 ? nextDelimiterOrEolIndex : line.Length) - i;
-                    var isAllRemainingWhitespace = string.IsNullOrWhiteSpace(line.Substring(i, remainingFieldLength));
-                    if (isAllRemainingWhitespace)
-                    {
-                        isMalformed = false;
-                        i = nextDelimiterOrEolIndex;
-                        if (i < 0)
-                        {
-                            line += delimiterChar;
-                            i = line.Length - 1;
-                        }
-                        else if (line[i] == '\r' || line[i] == '\n')
-                        {
-                            // If the field ends in an EOL character, then we need to increment past it
-                            if (line[i] == '\r' && i + 1 < line.Length && line[i + 1] == '\n')
-                            {
-                                i++;
-                            }
-                            i++;
-                        }
-                    }
-                }
-                else
-                {
-                    isMalformed = true;
-                }
+                return sb.ToString();
             }
-            else
-            {
-                isMalformed = true;
-            }
-
-            if (isMalformed)
-            {
-                throw CreateMalformedLineException(
-                    message: $"Line {currentLineNumber} cannot be parsed because of trailing characters after an end quote.",
-                    errorLine: line.TrimEnd('\r', '\n'),
-                    errorLineNumber: currentLineNumber
-                );
-            }
-            nextStartIndex = i + 1;
-            string field = sb.ToString();
-            if (TrimWhiteSpace)
-            {
-                field = field.Trim();
-            }
-            return field;
         }
 
-        private bool HasNextLine()
+        private struct TermHit
         {
-            if (peekedLine != null)
-            {
-                return true;
-            }
-            if (peekedEmptyLineCount > 0)
-            {
-                return false;
-            }
+            public string SourceTerm;
 
-            int ignoredEmptyLineCount;
-            var nextLine = ReadNextLineWithTrailingEol(ignoreEmptyLines: true, ignoredEmptyLineCount: out ignoredEmptyLineCount);
-            if (nextLine == null)
+            public Concept Concept;
+        }
+
+        private class Concept
+        {
+            // key: 语言代码 value: 该语言下的术语列表
+            public Dictionary<string, HashSet<string>> TermDic { get; set; }
+        }
+
+        private enum GlossaryFormat
+        {
+            MemoQCsv,   // 多语言列格式：English, English, Chinese_PRC, Chinese_PRC
+            DeepLCsv    // 扁平格式：SourceTerm, TargetTerm, SourceLanguage, TargetLanguage
+        }
+
+        private class StemmerFactory
+        {
+            public static bool TryGet(string langCode, out Stemmer stemmer)
             {
-                if (ignoredEmptyLineCount > 0)
+                switch (langCode)
                 {
-                    peekedEmptyLineCount = ignoredEmptyLineCount;
+                    //case "ara":
+                    //case "ara-AE":
+                    //case "ara-BH":
+                    //case "ara-DZ":
+                    //case "ara-EG":
+                    //case "ara-IQ":
+                    //case "ara-JO":
+                    //case "ara-KW":
+                    //case "ara-LB":
+                    //case "ara-LY":
+                    //case "ara-MA":
+                    //case "ara-OM":
+                    //case "ara-QA":
+                    //case "ara-SA":
+                    //case "ara-SY":
+                    //case "ara-TN":
+                    //case "ara-YE": stemmer = new ArabicStemmer(); return true; // UAX29 分词不完善
+                    case "hye": stemmer = new ArmenianStemmer(); return true;
+                    case "baq": stemmer = new BasqueStemmer(); return true;
+                    case "cat": stemmer = new CatalanStemmer(); return true;
+                    //case "cze": stemmer = new CzechStemmer(); return true; //缺少 Stemmer 实现
+                    case "dan": stemmer = new DanishStemmer(); return true;
+                    case "dut":
+                    case "dut-BE":
+                    case "dut-NL": stemmer = new DutchStemmer(); return true;
+                    case "eng":
+                    case "eng-AU":
+                    case "eng-BZ":
+                    case "eng-CA":
+                    case "eng-CB":
+                    case "eng-GB":
+                    case "eng-IE":
+                    case "eng-JM":
+                    case "eng-NZ":
+                    case "eng-PH":
+                    case "eng-TT":
+                    case "eng-US":
+                    case "eng-ZA":
+                    case "eng-ZW": stemmer = new EnglishStemmer(); return true;
+                    case "epo": stemmer = new EsperantoStemmer(); return true;
+                    case "est": stemmer = new EstonianStemmer(); return true;
+                    case "fin": stemmer = new FinnishStemmer(); return true;
+                    case "fre":
+                    case "fre-02":
+                    case "fre-BE":
+                    case "fre-CA":
+                    case "fre-CH":
+                    case "fre-FR":
+                    case "fre-LU":
+                    case "fre-MA":
+                    case "fre-MC": stemmer = new FrenchStemmer(); return true;
+                    case "ger":
+                    case "ger-AT":
+                    case "ger-CH":
+                    case "ger-DE":
+                    case "ger-LI":
+                    case "ger-LU": stemmer = new GermanStemmer(); return true;
+                    case "gre": stemmer = new GreekStemmer(); return true;
+                    //case "hin": stemmer = new HindiStemmer(); return true; // UAX29 分词不完善
+                    case "hun": stemmer = new HungarianStemmer(); return true;
+                    case "ind": stemmer = new IndonesianStemmer(); return true;
+                    case "gle": stemmer = new IrishStemmer(); return true;
+                    case "ita":
+                    case "ita-CH":
+                    case "ita-IT": stemmer = new ItalianStemmer(); return true;
+                    case "lit": stemmer = new LithuanianStemmer(); return true;
+                    //case "nep": stemmer = new NepaliStemmer(); return true; // UAX29 分词不完善
+                    case "nnb":
+                    case "nno":
+                    case "nor": stemmer = new NorwegianStemmer(); return true;
+                    //case "pol": stemmer = new PolishStemmer(); return true; // 缺少 Stemmer 实现
+                    //case "fas": stemmer = new PersianStemmer(); return true; // 缺少 Stemmer 实现、UAX29 分词不完善
+                    case "por":
+                    case "por-BR":
+                    case "por-PT": stemmer = new PortugueseStemmer(); return true;
+                    case "rum": stemmer = new RomanianStemmer(); return true;
+                    case "rus": stemmer = new RussianStemmer(); return true;
+                    case "scc":
+                    case "scr": stemmer = new SerbianStemmer(); return true;
+                    case "spa":
+                    case "spa-AR":
+                    case "spa-BO":
+                    case "spa-CL":
+                    case "spa-CO":
+                    case "spa-CR":
+                    case "spa-DO":
+                    case "spa-EC":
+                    case "spa-ES":
+                    case "spa-GT":
+                    case "spa-HN":
+                    case "spa-M9":
+                    case "spa-MX":
+                    case "spa-NI":
+                    case "spa-PA":
+                    case "spa-PE":
+                    case "spa-PR":
+                    case "spa-PY":
+                    case "spa-SV":
+                    case "spa-US":
+                    case "spa-UY":
+                    case "spa-VE": stemmer = new SpanishStemmer(); return true;
+                    case "swe":
+                    case "swe-FI":
+                    case "swe-SE": stemmer = new SwedishStemmer(); return true;
+                    //case "tam": stemmer = new TamilStemmer(); return true; // UAX29 分词不完善
+                    case "tur": stemmer = new TurkishStemmer(); return true;
+                    case "yid": stemmer = new YiddishStemmer(); return true;
+                    default: stemmer = null; return false;
                 }
-                return false;
-            }
-
-            peekedLine = nextLine;
-            peekedEmptyLineCount = ignoredEmptyLineCount;
-            return true;
-        }
-
-        private string ReadNextLineWithTrailingEol(bool ignoreEmptyLines)
-        {
-            int ignoredEmptyLineCount;
-            var line = ReadNextLineWithTrailingEol(ignoreEmptyLines, out ignoredEmptyLineCount);
-            return line;
-        }
-
-        private string ReadNextLineWithTrailingEol(bool ignoreEmptyLines, out int ignoredEmptyLineCount)
-        {
-            var line = ReadNextLineOrWhitespaceWithTrailingEol();
-
-            if (line == null && peekedEmptyLineCount > 0)
-            {
-                peekedEmptyLineCount = 0;
-            }
-
-            ignoredEmptyLineCount = 0;
-            if (ignoreEmptyLines)
-            {
-                while (line != null && IsLineEmpty(line))
-                {
-                    ignoredEmptyLineCount++;
-                    line = ReadNextLineOrWhitespaceWithTrailingEol();
-                }
-            }
-
-            return line;
-        }
-
-        private string ReadNextLineOrWhitespaceWithTrailingEol()
-        {
-            if (reader == null) return null;
-
-            if (peekedLine != null)
-            {
-                var temp = peekedLine;
-                peekedLine = null;
-                peekedEmptyLineCount = 0;
-                return temp;
-            }
-
-            var sb = new StringBuilder();
-            while (true)
-            {
-                int ch = reader.Read();
-                if (ch == -1) break;
-
-                sb.Append((char)ch);
-                if (ch == '\r' || ch == '\n')
-                {
-                    if (ch == '\r' && reader.Peek() == '\n')
-                    {
-                        sb.Append((char)reader.Read());
-                    }
-                    break;
-                }
-            }
-
-            if (sb.Length == 0)
-            {
-                return null;
-            }
-
-            var line = sb.ToString();
-            lineNumber++;
-            return line;
-        }
-
-        private bool IsLineEmpty(string line)
-        {
-            if (string.IsNullOrEmpty(line)) return true;
-            if (line.All(ch => ch == '\r' || ch == '\n')) return true;
-            if ((CompatibilityMode || TrimWhiteSpace) && string.IsNullOrWhiteSpace(line)) return true;
-            return false;
-        }
-
-        /// <summary>
-        /// The number of the line that will be returned by <see cref="ReadFields()"/> (starting at 1), or -1 if there are no more lines.
-        /// </summary>
-        public long LineNumber
-        {
-            get
-            {
-                if (!HasNextLine())
-                {
-                    // The VB version will return a line number if there's an empty line at the end of the file.
-                    // That's inconsitent with the HasNextLine method, so we'll only do that in compatibility mode.
-                    if (peekedEmptyLineCount > 0)
-                    {
-                        return lineNumber - peekedEmptyLineCount + 1;
-                    }
-                    return -1;
-                }
-                return lineNumber - peekedEmptyLineCount;
             }
         }
-
-        /// <summary>
-        /// Closes the current <see cref="CsvTextFieldParser"/> object.
-        /// </summary>
-        public void Close()
-        {
-            if (reader != null)
-            {
-                reader.Close();
-                reader = null;
-            }
-
-            if (!CompatibilityMode)
-            {
-                ErrorLine = string.Empty;
-                ErrorLineNumber = -1L;
-            }
-        }
-
-        /// <summary>
-        /// Closes and disposes the current <see cref="CsvTextFieldParser"/> object.
-        /// </summary>
-        public void Dispose()
-        {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-
-        /// <summary>
-        /// Disposes of the current <see cref="CsvTextFieldParser"/> object.
-        /// </summary>
-        /// <param name="disposing">true if called from <see cref="Dispose()"/>, or false if called from a finalizer</param>
-        protected virtual void Dispose(bool disposing)
-        {
-            if (disposing)
-            {
-                Close();
-            }
-        }
-
-        #region Error Handling
-
-        /// <summary>
-        /// The line that caused the most recent <see cref="CsvMalformedLineException"/>.
-        /// </summary>
-        /// <remarks>
-        /// If no <see cref="CsvMalformedLineException"/> exceptions have been thrown, an empty string is returned.
-        /// The <see cref="ErrorLineNumber"/> property can be used to display the number of the line that caused the exception.
-        /// </remarks>
-        public string ErrorLine { get; private set; } = string.Empty;
-
-        /// <summary>
-        /// Returns the number of the line that caused the most recent <see cref="CsvMalformedLineException"/> exception.
-        /// </summary>
-        /// <remarks>
-        /// If no <see cref="CsvMalformedLineException"/> exceptions have been thrown, -1 is returned.
-        /// The <see cref="ErrorLine"/> property can be used to display the number of the line that caused the exception.
-        /// Blank lines and comments are not ignored when determining the line number.
-        /// </remarks>
-        public long ErrorLineNumber { get; private set; } = -1;
-
-        private CsvMalformedLineException CreateMalformedLineException(string message, string errorLine, long errorLineNumber)
-        {
-            ErrorLine = errorLine;
-            ErrorLineNumber = errorLineNumber;
-            return new CsvMalformedLineException(
-                message: message,
-                lineNumber: errorLineNumber
-            );
-        }
-
-        #endregion
-
-        #region Configuration
-
-        /// <summary>
-        /// True if this parser should exactly reproduce the behavior of the Microsoft.VisualBasic.FileIO.TextFieldParser.
-        /// Defaults to false.
-        /// </summary>
-        public bool CompatibilityMode { get; set; } = false;
-
-        /// <summary>
-        /// Defines the delimiters for a text file.
-        /// Default is a comma.
-        /// </summary>
-        /// <remarks>
-        /// This is defined as an array of strings for compatibility with Microsoft.VisualBasic.FileIO.TextFieldParser,
-        /// but this parser only supports one single-character delimiter.
-        /// </remarks>
-        /// <exception cref="ArgumentException">A delimiter value is set to a newline character, an empty string, or null.</exception>
-        /// <exception cref="NotSupportedException">The delimiters are set to an array that does not contain exactly one element with exactly one character.</exception>
-        public string[] Delimiters
-        {
-            get
-            {
-                return new string[] { delimiterChar.ToString(CultureInfo.InvariantCulture) };
-            }
-            set
-            {
-                if (value == null || !value.Any())
-                {
-                    throw new NotSupportedException("This parser requires a delimiter");
-                }
-                if (value.Length > 1)
-                {
-                    throw new NotSupportedException("This parser does not support multiple delimiters.");
-                }
-
-                var delimiterString = value.Single();
-                if (string.IsNullOrEmpty(delimiterString))
-                {
-                    throw new ArgumentException("A delimiter cannot be null or an empty string.");
-                }
-                if (delimiterString.Length > 1)
-                {
-                    throw new NotSupportedException("This parser does not support a delimiter with multiple characters.");
-                }
-                SetDelimiter(delimiterString.Single());
-            }
-        }
-
-        /// <summary>
-        /// Sets the delimiter character used by this parser.
-        /// Default is a comma.
-        /// </summary>
-        /// <exception cref="ArgumentException">The delimiter character is set to a newline character.</exception>
-        public void SetDelimiter(char delimiterChar)
-        {
-            if (delimiterChar == '\n' || delimiterChar == '\r')
-            {
-                throw new ArgumentException("This parser does not support delimiters that contain end-of-line characters");
-            }
-            this.delimiterChar = delimiterChar;
-        }
-
-        /// <summary>
-        /// Sets the quote character used by this parser, and also sets the quote escape character to match if it previously matched.
-        /// Default is a double quote character.
-        /// </summary>
-        /// <exception cref="ArgumentException">The quote character is set to a newline character.</exception>
-        public void SetQuoteCharacter(char quoteChar)
-        {
-            if (quoteChar == '\n' || quoteChar == '\r')
-            {
-                throw new ArgumentException("This parser does not support end-of-line characters as a quote character");
-            }
-
-            // If the quote and escape characters currently match, then make sure they still match after we change the quote character.
-            if (this.quoteChar == this.quoteEscapeChar)
-            {
-                this.quoteEscapeChar = quoteChar;
-            }
-            this.quoteChar = quoteChar;
-        }
-
-        /// <summary>
-        /// Sets the quote escape character used by this parser.
-        /// Default is the same as the quote character, a double quote character.
-        /// </summary>
-        /// <exception cref="ArgumentException">The quote escape character is set to a newline character.</exception>
-        public void SetQuoteEscapeCharacter(char quoteEscapeChar)
-        {
-            if (quoteEscapeChar == '\n' || quoteEscapeChar == '\r')
-            {
-                throw new ArgumentException("This parser does not support end-of-line characters as a quote escape character");
-            }
-            this.quoteEscapeChar = quoteEscapeChar;
-        }
-
-        /// <summary>
-        /// Denotes whether fields are enclosed in quotation marks when a CSV file is being parsed.
-        /// Defaults to true.
-        /// </summary>
-        public bool HasFieldsEnclosedInQuotes { get; set; } = true;
-
-        /// <summary>
-        /// Indicates whether leading and trailing white space should be trimmed from field values.
-        /// Defaults to false.
-        /// </summary>
-        public bool TrimWhiteSpace { get; set; } = false;
-
         #endregion
     }
 
-
-    /// <summary>
-    /// An exception that is thrown when the <see cref="CsvTextFieldParser.ReadFields"/> method cannot parse a row using the specified format.
-    /// </summary>
-    /// <remarks>
-    /// Based on Microsoft.VisualBasic.FileIO.MalformedLineException.MalformedLineException.
-    /// </remarks>
-    class CsvMalformedLineException : FormatException
-    {
-        /// <summary>
-        /// Constructs an exception with a specified message and a line number.
-        /// </summary>
-        public CsvMalformedLineException(string message, long lineNumber)
-            : base(message)
-        {
-            LineNumber = lineNumber;
-        }
-
-        /// <summary>
-        /// Constructs an exception with a specified message, a line number, and a reference to the inner exception that is the cause of this exception.
-        /// </summary>
-        public CsvMalformedLineException(string message, long lineNumber, Exception innerException)
-            : base(message, innerException)
-        {
-            LineNumber = lineNumber;
-        }
-
-        /// <summary>
-        /// The line number of the malformed line.
-        /// </summary>
-        public long LineNumber { get; }
-    }
 }
