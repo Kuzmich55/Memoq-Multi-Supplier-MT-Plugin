@@ -75,6 +75,19 @@ namespace MultiSupplierMTPlugin.ProvidersCommon.Forms.LLM
             labelPath.Text = LLH.G(LLK.LabelPath);
 
             labelMaxTokens.Text = LLH.G(LLK.LabelMaxTokens);
+            if (_service.UniqueName != ServiceNames.Anthropic_LLM)
+            {
+                labelMaxTokens.Text = labelMaxTokens.Text + "^";
+                toolTip.SetToolTip(labelMaxTokens, LLH.G(LLK.LabelMaxTokensToolTip));
+            }
+
+            labelMaxCompletionTokens.Text = LLH.G(LLK.LabelMaxCompletionTokens);
+            if (_service.UniqueName != ServiceNames.Anthropic_LLM)
+            {
+                labelMaxCompletionTokens.Text = labelMaxCompletionTokens.Text + "^";
+                toolTip.SetToolTip(labelMaxCompletionTokens, LLH.G(LLK.LabelMaxCompletionTokensToolTip));
+            }
+
             labelTemperature.Text = LLH.G(LLK.LabelTemperature);
 
             labelOrganization.Text = LLH.G(LLK.LabelOrganization);
@@ -106,7 +119,15 @@ namespace MultiSupplierMTPlugin.ProvidersCommon.Forms.LLM
             textBoxBaseUrl.Text = _generalSettings.BaseURL;
             textBoxPath.Text = _generalSettings.Path;
 
+            labelMaxTokens.Visible = !_generalSettings.UseMaxCompletionTokensInsteadMaxTokens;
+            numericUpDownMaxTokens.Visible = !_generalSettings.UseMaxCompletionTokensInsteadMaxTokens;
+
+            labelMaxCompletionTokens.Visible = _generalSettings.UseMaxCompletionTokensInsteadMaxTokens;
+            numericUpDownMaxCompletionTokens.Visible = _generalSettings.UseMaxCompletionTokensInsteadMaxTokens;
+
             numericUpDownMaxTokens.Value = _generalSettings.MaxTokens;
+            numericUpDownMaxCompletionTokens.Value = _generalSettings.MaxCompletionTokens;
+            
             numericUpDownTemperature.Value = (decimal)_generalSettings.Temperature;
 
             textBoxOrganization.Text = _secureSettings.Organization;
@@ -188,6 +209,7 @@ namespace MultiSupplierMTPlugin.ProvidersCommon.Forms.LLM
                     _generalSettings.BaseURL != textBoxBaseUrl.Text ||
                     _generalSettings.Path != textBoxPath.Text ||
                     _generalSettings.MaxTokens != (int)numericUpDownMaxTokens.Value ||
+                    _generalSettings.MaxCompletionTokens != (int)numericUpDownMaxCompletionTokens.Value ||
                     _generalSettings.Temperature != (double)numericUpDownTemperature.Value ||
                     _secureSettings.Organization != textBoxOrganization.Text ||
                     _secureSettings.ApiKey != textBoxApiKey.Text ||
@@ -217,6 +239,7 @@ namespace MultiSupplierMTPlugin.ProvidersCommon.Forms.LLM
             textBoxBaseUrl.TextChanged += onOptionsChanged;
             textBoxPath.TextChanged += onOptionsChanged;
             numericUpDownMaxTokens.ValueChanged += onOptionsChanged;
+            numericUpDownMaxCompletionTokens.ValueChanged += onOptionsChanged;
             numericUpDownTemperature.ValueChanged += onOptionsChanged;
             textBoxOrganization.TextChanged += onOptionsChanged;
             textBoxApiKey.TextChanged += onOptionsChanged;
@@ -256,12 +279,16 @@ namespace MultiSupplierMTPlugin.ProvidersCommon.Forms.LLM
             bg.Path = textBoxPath.Text;
 
             bg.MaxTokens = (int)numericUpDownMaxTokens.Value;
+            bg.MaxCompletionTokens = (int)numericUpDownMaxCompletionTokens.Value;
+
+            bg.UseMaxCompletionTokensInsteadMaxTokens = labelMaxCompletionTokens.Visible;
+
             bg.Temperature = (double)numericUpDownTemperature.Value;
 
             bg.Model = ComboBoxModelsRealValue();
 
             bg.EnableBathTranslate = false;
-            bg.PromptTemplateId = "";
+            bg.PromptTemplateId = "";            
 
             bg.SystemPrompt = "You are an AI."; // 测试无需真实值
             bg.UserPrompt = "This is a connection test, output 'yes' only."; // 测试无需真实值  
@@ -460,6 +487,27 @@ namespace MultiSupplierMTPlugin.ProvidersCommon.Forms.LLM
             }
         }
 
+        private void labelMaxTokens_DoubleClick(object sender, EventArgs e)
+        {
+            if (_service.UniqueName == ServiceNames.Anthropic_LLM) return;
+
+            labelMaxTokens.Visible = !labelMaxTokens.Visible;
+            numericUpDownMaxTokens.Visible = !numericUpDownMaxTokens.Visible;
+
+            labelMaxCompletionTokens.Visible = !labelMaxCompletionTokens.Visible;
+            numericUpDownMaxCompletionTokens.Visible = !numericUpDownMaxCompletionTokens.Visible;
+        }
+
+        private void labelMaxCompletionTokens_DoubleClick(object sender, EventArgs e)
+        {
+            if (_service.UniqueName == ServiceNames.Anthropic_LLM) return;
+
+            labelMaxTokens.Visible = !labelMaxTokens.Visible;
+            numericUpDownMaxTokens.Visible = !numericUpDownMaxTokens.Visible;
+
+            labelMaxCompletionTokens.Visible = !labelMaxCompletionTokens.Visible;
+            numericUpDownMaxCompletionTokens.Visible = !numericUpDownMaxCompletionTokens.Visible;
+        }
 
         private void OptionsForm_FormClosing(object sender, FormClosingEventArgs e)
         {
@@ -469,6 +517,10 @@ namespace MultiSupplierMTPlugin.ProvidersCommon.Forms.LLM
                 _generalSettings.Path = textBoxPath.Text;
 
                 _generalSettings.MaxTokens = (int)numericUpDownMaxTokens.Value;
+                _generalSettings.MaxCompletionTokens = (int)numericUpDownMaxCompletionTokens.Value;
+
+                _generalSettings.UseMaxCompletionTokensInsteadMaxTokens = labelMaxCompletionTokens.Visible;
+
                 _generalSettings.Temperature = (double)numericUpDownTemperature.Value;
 
                 _secureSettings.Organization = textBoxOrganization.Text;
@@ -514,6 +566,15 @@ namespace MultiSupplierMTPlugin.ProvidersCommon.Forms.LLM
 
         [LocalizedValue("0e793242-acff-4e42-852e-076645f7dcfd", "Max Tokens", "最大词元数")]
         public static OptionsFormLocalizedKey LabelMaxTokens { get; private set; }
+
+        [LocalizedValue("bc6059dc-c616-4ea5-b28e-30471ccb51fe", "Double-click this label to switch to 'Max Completion Tokens'", "双击此标签切换到“最大完成词元数”")]
+        public static OptionsFormLocalizedKey LabelMaxTokensToolTip { get; private set; }
+
+        [LocalizedValue("e936c2ab-c4cf-4a61-bd12-acbdd2da91e0", "Max Completion Tokens", "最大完成词元数")]
+        public static OptionsFormLocalizedKey LabelMaxCompletionTokens { get; private set; }
+
+        [LocalizedValue("c312b017-d4a7-4611-a632-8a9eccd3b50b", "Double-click this label to switch to 'Max Tokens'", "双击此标签切换到“最大词元数”")]
+        public static OptionsFormLocalizedKey LabelMaxCompletionTokensToolTip { get; private set; }
 
         [LocalizedValue("8793bde6-cdf1-4fca-a7db-2d42251c4097", "Temperature", "温度")]
         public static OptionsFormLocalizedKey LabelTemperature { get; private set; }

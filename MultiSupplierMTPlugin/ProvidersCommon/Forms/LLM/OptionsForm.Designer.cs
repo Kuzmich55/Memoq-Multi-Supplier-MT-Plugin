@@ -60,8 +60,12 @@ namespace MultiSupplierMTPlugin.ProvidersCommon.Forms.LLM
             this.linkLabelBatchTranslate = new System.Windows.Forms.LinkLabel();
             this.labelOtherOptions = new System.Windows.Forms.Label();
             this.toolTip = new System.Windows.Forms.ToolTip(this.components);
+            this.labelMaxCompletionTokens = new System.Windows.Forms.Label();
+            this.numericUpDownMaxCompletionTokens = new System.Windows.Forms.NumericUpDown();
+            this.commonBottomControl = new MultiSupplierMTPlugin.ProviderdsCommon.Forms.CommonBottomControl();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDownTemperature)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDownMaxTokens)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDownMaxCompletionTokens)).BeginInit();
             this.SuspendLayout();
             // 
             // labelBaseUrl
@@ -269,7 +273,8 @@ namespace MultiSupplierMTPlugin.ProvidersCommon.Forms.LLM
             this.labelMaxTokens.Name = "labelMaxTokens";
             this.labelMaxTokens.Size = new System.Drawing.Size(130, 18);
             this.labelMaxTokens.TabIndex = 4;
-            this.labelMaxTokens.Text = "Max Tokens";
+            this.labelMaxTokens.Text = "Max Tokens^";
+            this.labelMaxTokens.DoubleClick += new System.EventHandler(this.labelMaxTokens_DoubleClick);
             // 
             // buttonListModels
             // 
@@ -351,6 +356,50 @@ namespace MultiSupplierMTPlugin.ProvidersCommon.Forms.LLM
             this.labelOtherOptions.TabIndex = 22;
             this.labelOtherOptions.Text = "Other Options";
             // 
+            // toolTip
+            // 
+            this.toolTip.AutoPopDelay = 5000;
+            this.toolTip.InitialDelay = 100;
+            this.toolTip.IsBalloon = true;
+            this.toolTip.ReshowDelay = 100;
+            // 
+            // labelMaxCompletionTokens
+            // 
+            this.labelMaxCompletionTokens.Location = new System.Drawing.Point(11, 93);
+            this.labelMaxCompletionTokens.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.labelMaxCompletionTokens.Name = "labelMaxCompletionTokens";
+            this.labelMaxCompletionTokens.Size = new System.Drawing.Size(130, 18);
+            this.labelMaxCompletionTokens.TabIndex = 4;
+            this.labelMaxCompletionTokens.Text = "Max Completion Tokens^";
+            this.labelMaxCompletionTokens.DoubleClick += new System.EventHandler(this.labelMaxCompletionTokens_DoubleClick);
+            // 
+            // numericUpDownMaxCompletionTokens
+            // 
+            this.numericUpDownMaxCompletionTokens.Increment = new decimal(new int[] {
+            1024,
+            0,
+            0,
+            0});
+            this.numericUpDownMaxCompletionTokens.Location = new System.Drawing.Point(148, 90);
+            this.numericUpDownMaxCompletionTokens.Maximum = new decimal(new int[] {
+            64000,
+            0,
+            0,
+            0});
+            this.numericUpDownMaxCompletionTokens.Minimum = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
+            this.numericUpDownMaxCompletionTokens.Name = "numericUpDownMaxCompletionTokens";
+            this.numericUpDownMaxCompletionTokens.Size = new System.Drawing.Size(116, 25);
+            this.numericUpDownMaxCompletionTokens.TabIndex = 5;
+            this.numericUpDownMaxCompletionTokens.Value = new decimal(new int[] {
+            4096,
+            0,
+            0,
+            0});
+            // 
             // commonBottomControl
             // 
             this.commonBottomControl.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
@@ -360,13 +409,6 @@ namespace MultiSupplierMTPlugin.ProvidersCommon.Forms.LLM
             this.commonBottomControl.Name = "commonBottomControl";
             this.commonBottomControl.Size = new System.Drawing.Size(513, 75);
             this.commonBottomControl.TabIndex = 26;
-            // 
-            // toolTip
-            // 
-            this.toolTip.AutoPopDelay = 5000;
-            this.toolTip.InitialDelay = 100;
-            this.toolTip.IsBalloon = true;
-            this.toolTip.ReshowDelay = 100;
             // 
             // OptionsForm
             // 
@@ -383,7 +425,6 @@ namespace MultiSupplierMTPlugin.ProvidersCommon.Forms.LLM
             this.Controls.Add(this.labelPromptTemplate);
             this.Controls.Add(this.buttonListModels);
             this.Controls.Add(this.numericUpDownMaxTokens);
-            this.Controls.Add(this.labelMaxTokens);
             this.Controls.Add(this.linkLabelApiKey);
             this.Controls.Add(this.linkLabelModel);
             this.Controls.Add(this.textBoxUserPrompt);
@@ -400,6 +441,9 @@ namespace MultiSupplierMTPlugin.ProvidersCommon.Forms.LLM
             this.Controls.Add(this.labelBaseUrl);
             this.Controls.Add(this.linkLabelMoreSettings);
             this.Controls.Add(this.textBoxSystemPrompt);
+            this.Controls.Add(this.labelMaxTokens);
+            this.Controls.Add(this.labelMaxCompletionTokens);
+            this.Controls.Add(this.numericUpDownMaxCompletionTokens);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
             this.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             this.MaximizeBox = false;
@@ -412,6 +456,7 @@ namespace MultiSupplierMTPlugin.ProvidersCommon.Forms.LLM
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.OptionsForm_FormClosing);
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDownTemperature)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDownMaxTokens)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDownMaxCompletionTokens)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -447,5 +492,7 @@ namespace MultiSupplierMTPlugin.ProvidersCommon.Forms.LLM
         private System.Windows.Forms.LinkLabel linkLabelBatchTranslate;
         private System.Windows.Forms.Label labelOtherOptions;
         private System.Windows.Forms.ToolTip toolTip;
+        private System.Windows.Forms.Label labelMaxCompletionTokens;
+        private System.Windows.Forms.NumericUpDown numericUpDownMaxCompletionTokens;
     }
 }

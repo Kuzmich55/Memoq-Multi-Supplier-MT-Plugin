@@ -17,8 +17,31 @@ namespace MultiSupplierMTPlugin.Providers.OpenAI
         //[JsonProperty("logit_bias")]
         //public string LogitBias { get; set; }
 
-        [JsonProperty("max_tokens")]
-        public int MaxTokens { get; set; }
+        private int? _maxTokens;
+        
+        [JsonProperty("max_tokens", NullValueHandling = NullValueHandling.Ignore)]
+        public int? MaxTokens
+        {
+            get => _maxTokens;
+            set
+            {
+                _maxTokens = value;
+                if (value.HasValue) _maxCompletionTokens = null;
+            }
+        }
+
+        private int? _maxCompletionTokens;
+
+        [JsonProperty("max_completion_tokens", NullValueHandling = NullValueHandling.Ignore)]
+        public int? MaxCompletionTokens
+        {
+            get => _maxCompletionTokens;
+            set
+            {
+                _maxCompletionTokens = value;
+                if (value.HasValue) _maxTokens = null;
+            }
+        }
 
         //[JsonProperty("n")]
         //public int N { get; set; }

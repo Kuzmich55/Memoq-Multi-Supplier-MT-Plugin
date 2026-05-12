@@ -161,8 +161,15 @@ namespace MultiSupplierMTPlugin.Providers.OpenAI
                 Model = g.Model,
 
                 MaxTokens = g.MaxTokens,
+                MaxCompletionTokens = null,
                 Temperature = g.Temperature,
             };
+
+            if (g.UseMaxCompletionTokensInsteadMaxTokens)
+            {
+                chatCompletionRequest.MaxTokens = null;
+                chatCompletionRequest.MaxCompletionTokens = g.MaxCompletionTokens;
+            }
 
             // 7.请求体批量翻译格式处理
             if (g.EnableBathTranslate)

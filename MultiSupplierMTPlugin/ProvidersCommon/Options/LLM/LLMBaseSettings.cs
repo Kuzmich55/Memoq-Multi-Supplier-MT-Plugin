@@ -6,6 +6,9 @@
         public virtual string Path { get; set; } = "/chat/completions";
 
         public virtual int MaxTokens { get; set; } = 4096;
+        public virtual int MaxCompletionTokens { get; set; } = 8192;
+        public virtual bool UseMaxCompletionTokensInsteadMaxTokens { get; set; } = false;
+        
         public virtual double Temperature { get; set; } = 1.0;
 
         public virtual string Model { get; set; } = string.Empty;
