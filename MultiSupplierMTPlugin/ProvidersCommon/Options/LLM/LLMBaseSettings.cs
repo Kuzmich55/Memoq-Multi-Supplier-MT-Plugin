@@ -23,8 +23,8 @@
         public virtual bool EnableBathTranslate { get; set; } = false;
         public virtual int BathTranslateMaxSegments { get; set; } = 0;
         public virtual int BathTranslateMaxCharacters { get; set; } = 3000;
-        public virtual BathTranslateSchema BathTranslateSchema { get; set; } = BathTranslateSchema.Shorter;
-        public virtual BathTranslateResponseFormat BathTranslateResponseFormat { get; set; } = BathTranslateResponseFormat.JSON_Object;
+        public virtual BatchTranslateSchema BathTranslateSchema { get; set; } = BatchTranslateSchema.Shorter;
+        public virtual BatchTranslateResponseFormat BathTranslateResponseFormat { get; set; } = BatchTranslateResponseFormat.JSON_Object;
     }
 
     class LLMBaseSecureSettings : ProviderSecureSettings
@@ -35,13 +35,13 @@
     }
 
 
-    enum BathTranslateSchema
+    enum BatchTranslateSchema
     {
         Shorter,
         Longer
     }
 
-    enum BathTranslateResponseFormat
+    enum BatchTranslateResponseFormat
     {
         Text,
         JSON_Object,

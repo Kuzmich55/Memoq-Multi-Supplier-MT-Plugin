@@ -6,7 +6,7 @@ using System.Linq;
 
 namespace MultiSupplierMTPlugin.Helpers
 {
-    class BathTranslateHelper
+    class BatchTranslateHelper
     {
         private static Dictionary<string, object> _jsonSchemaShorter = new Dictionary<string, object>
         {
@@ -55,14 +55,14 @@ namespace MultiSupplierMTPlugin.Helpers
         };
 
 
-        public static Dictionary<string, object> GetJsonScheme(BathTranslateSchema schema)
+        public static Dictionary<string, object> GetJsonScheme(BatchTranslateSchema schema)
         {
-            return schema == BathTranslateSchema.Longer ? _jsonSchemaLonger : _jsonSchemaShorter;
+            return schema == BatchTranslateSchema.Longer ? _jsonSchemaLonger : _jsonSchemaShorter;
         }
 
-        public static string Serialize(BathTranslateSchema schema, List<string> texts)
+        public static string Serialize(BatchTranslateSchema schema, List<string> texts)
         {
-            if (schema == BathTranslateSchema.Longer)
+            if (schema == BatchTranslateSchema.Longer)
             {
                 var textEntities = new SchemaLongerEntity
                 {
@@ -77,53 +77,77 @@ namespace MultiSupplierMTPlugin.Helpers
             return JsonConvert.SerializeObject(textMap);
         }
 
-        public static List<string> Deserialize(BathTranslateSchema schema, int count, string content)
+        public static List<string> Deserialize(BatchTranslateSchema schema, BatchTranslateResponseFormat format, int count, string content)
         {
+            if (format == BatchTranslateResponseFormat.Text)
+            {
+                int firstBrace = content.IndexOf('{');
+                int lastBrace = content.LastIndexOf('}');
+
+                bool hasBraces = firstBrace != -1 && lastBrace > firstBrace;
+                bool needsTrim = firstBrace > 0 || lastBrace < content.Length - 1;
+
+                if (hasBraces && needsTrim)
+                    content = content.Substring(firstBrace, lastBrace - firstBrace + 1);
+            }
+
+            object deserialized;
             try
             {
-                string[] results = new string[count];
-
-                if (schema == BathTranslateSchema.Longer)
-                {
-                    var items = JsonConvert.DeserializeObject<SchemaLongerEntity>(content).Texts;
-
-                    if (items.Length != count)
-                        throw new Exception($"The number of batch translation items is incorrect. Expected {count} items.");
-
-                    foreach (var item in items)
-                    {
-                        int index = item.Id - 1;
-
-                        if (index < 0 || index >= count || results[index] != null)
-                            throw new Exception($"Invalid item ID in batch translation response (must be 1 to {count} and unique).");
-
-                        results[index] = item.Text;
-                    }
-                }
+                if (schema == BatchTranslateSchema.Longer)
+                    deserialized = JsonConvert.DeserializeObject<SchemaLongerEntity>(content);
                 else
-                {
-                    var map = JsonConvert.DeserializeObject<Dictionary<string, string>>(content);
-
-                    if (map.Count != count)
-                        throw new Exception($"The number of batch translation items is incorrect. Expected {count} items.");
-
-                    foreach (var kv in map)
-                    {
-                        int index = int.Parse(kv.Key) - 1;
-
-                        if (index < 0 || index >= count || results[index] != null)
-                            throw new Exception($"Invalid item ID in batch translation response (must be 1 to {count} and unique).");
-
-                        results[index] = kv.Value;
-                    }
-                }
-
-                return results.ToList();
+                    deserialized = JsonConvert.DeserializeObject<Dictionary<string, string>>(content);
             }
-            catch
+            catch (Exception ex)
             {
-                throw new Exception("Invalid JSON format in batch translation response. Please review your configuration or prompt.\"");
+                throw new Exception($"Invalid JSON format in batch translation response. Please check your prompt or batch translation settings. Original error: {ex.Message}", ex);
             }
+
+            string[] results = new string[count];
+
+            if (schema == BatchTranslateSchema.Longer)
+            {
+                var items = ((SchemaLongerEntity)deserialized).Texts;
+                
+                if (items == null)
+                    throw new Exception("Missing 'texts' array in batch translation response.");
+
+                if (items.Length != count)
+                    throw new Exception($"The number of batch translation items is incorrect. Expected {count} but got {items.Length}.");
+
+                foreach (var item in items)
+                {
+                    int index = item.Id - 1;
+
+                    if (index < 0 || index >= count || results[index] != null)
+                        throw new Exception($"Invalid item ID in batch translation response. must be 1 to {count} and unique.");
+
+                    results[index] = item.Text;
+                }
+            }
+            else
+            {
+                var map = (Dictionary<string, string>)deserialized;
+
+                if (map.Count != count)
+                    throw new Exception($"The number of batch translation items is incorrect. Expected {count} but got {map.Count}.");
+
+                foreach (var kv in map)
+                {
+                    if (!int.TryParse(kv.Key, out int id))
+                        throw new Exception($"Invalid item ID in batch translation response. '{kv.Key}' is not a valid number.");
+
+                    int index = id - 1;
+
+                    if (index < 0 || index >= count || results[index] != null)
+                        throw new Exception($"Invalid item ID in batch translation response. must be 1 to {count} and unique.");
+
+                    results[index] = kv.Value;
+                }
+            }
+
+            return results.ToList();
         }
 
 

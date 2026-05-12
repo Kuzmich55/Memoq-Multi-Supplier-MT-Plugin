@@ -273,7 +273,7 @@ namespace MultiSupplierMTPlugin
 
             // 14.是否批量翻译，以及批量翻译时的结果解析
             var result = g.EnableBathTranslate
-                ? BathTranslateHelper.Deserialize(g.BathTranslateSchema, texts.Count, content)
+                ? BatchTranslateHelper.Deserialize(g.BathTranslateSchema, g.BathTranslateResponseFormat, texts.Count, content)
                 : new List<string> { content };
 
             // 15.返回最终结果

@@ -68,15 +68,15 @@ namespace MultiSupplierMTPlugin.ProvidersCommon.Forms.LLM
             textBoxSystemPrompt.ContextMenuStrip = textBoxPromptMenu;
             textBoxUserPrompt.ContextMenuStrip = textBoxPromptMenu;
 
-            groupBoxBathTranslate.Text = LLH.G(LLK.GroupBoxBathTranslate);
-            labelBathTranslateSystemPrompt.Text = LLH.G(LLK.LabelBathTranslateSystemPrompt);
-            labelBathTranslateUserPrompt.Text = LLH.G(LLK.LabelBathTranslateUserPrompt);
+            groupBoxBatchTranslate.Text = LLH.G(LLK.GroupBoxBatchTranslate);
+            labelBatchTranslateSystemPrompt.Text = LLH.G(LLK.LabelBatchTranslateSystemPrompt);
+            labelBatchTranslateUserPrompt.Text = LLH.G(LLK.LabelBatchTranslateUserPrompt);
 
-            toolTip.SetToolTip(labelBathTranslateSystemPrompt, LLH.G(LLKC.ToolTip_LLMPromptTip));
-            toolTip.SetToolTip(labelBathTranslateUserPrompt, LLH.G(LLKC.ToolTip_LLMPromptTip));
+            toolTip.SetToolTip(labelBatchTranslateSystemPrompt, LLH.G(LLKC.ToolTip_LLMPromptTip));
+            toolTip.SetToolTip(labelBatchTranslateUserPrompt, LLH.G(LLKC.ToolTip_LLMPromptTip));
 
-            textBoxBathTranslateSystemPrompt.ContextMenuStrip = textBoxPromptMenu;
-            textBoxBathTranslateUserPrompt.ContextMenuStrip = textBoxPromptMenu;
+            textBoxBatchTranslateSystemPrompt.ContextMenuStrip = textBoxPromptMenu;
+            textBoxBatchTranslateUserPrompt.ContextMenuStrip = textBoxPromptMenu;
 
             buttonOK.Text = LLH.G(LLKC.ButtonOK);
             buttonCancel.Text = LLH.G(LLKC.ButtonCancel);
@@ -126,16 +126,16 @@ namespace MultiSupplierMTPlugin.ProvidersCommon.Forms.LLM
 
             textBoxName.Text = prompt?.Name ?? "";
 
-                textBoxSystemPrompt.Text = prompt?.SystemPrompt
-                  .Replace(Environment.NewLine, "\n").Replace("\n", Environment.NewLine) ?? ""; // 解决 xml 反序列化后换行符总是变成 \n
-                textBoxUserPrompt.Text = prompt?.UserPrompt
-                    .Replace(Environment.NewLine, "\n").Replace("\n", Environment.NewLine) ?? ""; // 解决 xml 反序列化后换行符总是变成 \n;
+            textBoxSystemPrompt.Text = prompt?.SystemPrompt
+              .Replace(Environment.NewLine, "\n").Replace("\n", Environment.NewLine) ?? ""; // 解决 xml 反序列化后换行符总是变成 \n
+            textBoxUserPrompt.Text = prompt?.UserPrompt
+                .Replace(Environment.NewLine, "\n").Replace("\n", Environment.NewLine) ?? ""; // 解决 xml 反序列化后换行符总是变成 \n;
 
-                textBoxBathTranslateSystemPrompt.Text = prompt?.BathTranslateSystemPrompt
-                 .Replace(Environment.NewLine, "\n").Replace("\n", Environment.NewLine) ?? ""; // 解决 xml 反序列化后换行符总是变成 \n
-                textBoxBathTranslateUserPrompt.Text = prompt?.BathTranslateUserPrompt
-                    .Replace(Environment.NewLine, "\n").Replace("\n", Environment.NewLine) ?? ""; // 解决 xml 反序列化后换行符总是变成 \n;
-            }
+            textBoxBatchTranslateSystemPrompt.Text = prompt?.BathTranslateSystemPrompt
+             .Replace(Environment.NewLine, "\n").Replace("\n", Environment.NewLine) ?? ""; // 解决 xml 反序列化后换行符总是变成 \n
+            textBoxBatchTranslateUserPrompt.Text = prompt?.BathTranslateUserPrompt
+                .Replace(Environment.NewLine, "\n").Replace("\n", Environment.NewLine) ?? ""; // 解决 xml 反序列化后换行符总是变成 \n;
+        }
 
 
         private void buttonAdd_Click(object sender, EventArgs e)
@@ -180,17 +180,17 @@ namespace MultiSupplierMTPlugin.ProvidersCommon.Forms.LLM
             {
                 var name = textBoxName.Text;
 
-                    if (_promptTemplates.Any(p => p.Name == name && prompt.Name != name))
-                    {
-                        MessageBox.Show(LLH.G(LLK.MessageAlreadyExists), "", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                if (_promptTemplates.Any(p => p.Name == name && prompt.Name != name))
+                {
+                    MessageBox.Show(LLH.G(LLK.MessageAlreadyExists), "", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     textBoxName.Text = prompt.Name;
-                        return;
-                    }
-
-                    prompt.Name = name;
-                    ((CurrencyManager)BindingContext[comboBoxTemplates.DataSource]).Refresh();
+                    return;
                 }
+
+                prompt.Name = name;
+                ((CurrencyManager)BindingContext[comboBoxTemplates.DataSource]).Refresh();
             }
+        }
 
         private void textBoxSystemPrompt_TextChanged(object sender, EventArgs e)
         {
@@ -211,21 +211,21 @@ namespace MultiSupplierMTPlugin.ProvidersCommon.Forms.LLM
         }
 
 
-        private void textBoxBathTranslateSystemPrompt_TextChanged(object sender, EventArgs e)
+        private void textBoxBatchTranslateSystemPrompt_TextChanged(object sender, EventArgs e)
         {
             if (comboBoxTemplates.SelectedItem is PromptTemplate prompt)
             {
-                prompt.BathTranslateSystemPrompt = textBoxBathTranslateSystemPrompt.Text;
-                textBoxBathTranslateSystemPrompt.ScrollBars = textBoxBathTranslateSystemPrompt.Lines.Length > 6 ? ScrollBars.Vertical : ScrollBars.None;
+                prompt.BathTranslateSystemPrompt = textBoxBatchTranslateSystemPrompt.Text;
+                textBoxBatchTranslateSystemPrompt.ScrollBars = textBoxBatchTranslateSystemPrompt.Lines.Length > 6 ? ScrollBars.Vertical : ScrollBars.None;
             }
         }
 
-        private void textBoxBathTranslateUserPrompt_TextChanged(object sender, EventArgs e)
+        private void textBoxBatchTranslateUserPrompt_TextChanged(object sender, EventArgs e)
         {
             if (comboBoxTemplates.SelectedItem is PromptTemplate prompt)
             {
-                prompt.BathTranslateUserPrompt = textBoxBathTranslateUserPrompt.Text;
-                textBoxBathTranslateUserPrompt.ScrollBars = textBoxBathTranslateUserPrompt.Lines.Length > 6 ? ScrollBars.Vertical : ScrollBars.None;
+                prompt.BathTranslateUserPrompt = textBoxBatchTranslateUserPrompt.Text;
+                textBoxBatchTranslateUserPrompt.ScrollBars = textBoxBatchTranslateUserPrompt.Lines.Length > 6 ? ScrollBars.Vertical : ScrollBars.None;
             }
         }
 
@@ -247,7 +247,7 @@ namespace MultiSupplierMTPlugin.ProvidersCommon.Forms.LLM
         {
             if (DialogResult == DialogResult.OK)
             {
-                _mtGeneralSettings.LLMCommon.PromptTemplates = _promptTemplates.ToArray();
+               _mtGeneralSettings.LLMCommon.PromptTemplates = _promptTemplates.ToArray();
             }
         }
     }
@@ -290,14 +290,14 @@ namespace MultiSupplierMTPlugin.ProvidersCommon.Forms.LLM
         [LocalizedValue("aa1943dd-abdc-4a13-b6f6-293144219aaf", "User Prompt^", "用户提示词^")]
         public static PromptTemplateManageLocalizedKey LabelUserPrompt { get; private set; }
 
-        [LocalizedValue("86643d6d-60d7-4657-ade2-8a8929892dac", "Use For Bath Translate", "用于批量翻译")]
-        public static PromptTemplateManageLocalizedKey GroupBoxBathTranslate { get; private set; }
+        [LocalizedValue("86643d6d-60d7-4657-ade2-8a8929892dac", "Use For Batch Translate", "用于批量翻译")]
+        public static PromptTemplateManageLocalizedKey GroupBoxBatchTranslate { get; private set; }
 
         [LocalizedValue("87c5b641-ad6e-4e26-899b-9ef7317ac40d", "System Prompt^", "系统提示词^")]
-        public static PromptTemplateManageLocalizedKey LabelBathTranslateSystemPrompt { get; private set; }
+        public static PromptTemplateManageLocalizedKey LabelBatchTranslateSystemPrompt { get; private set; }
 
         [LocalizedValue("51da8b07-42b8-459e-adc7-853fe2ebb782", "User Prompt^", "用户提示词^")]
-        public static PromptTemplateManageLocalizedKey LabelBathTranslateUserPrompt { get; private set; }
+        public static PromptTemplateManageLocalizedKey LabelBatchTranslateUserPrompt { get; private set; }
 
         [LocalizedValue("f7e49fcd-990c-4166-999d-c0dee50fd85e", "Name already exists", "名称已存在")]
         public static PromptTemplateManageLocalizedKey MessageAlreadyExists { get; private set; }

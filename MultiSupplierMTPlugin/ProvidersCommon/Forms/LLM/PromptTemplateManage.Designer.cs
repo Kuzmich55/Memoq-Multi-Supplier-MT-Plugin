@@ -40,17 +40,17 @@
             this.buttonAdd = new System.Windows.Forms.Button();
             this.buttonDelete = new System.Windows.Forms.Button();
             this.textBoxName = new System.Windows.Forms.TextBox();
-            this.textBoxTemplate = new System.Windows.Forms.TextBox();
             this.toolTip = new System.Windows.Forms.ToolTip(this.components);
-            this.textBoxBathTranslateUserPrompt = new System.Windows.Forms.TextBox();
-            this.labelBathTranslateUserPrompt = new System.Windows.Forms.Label();
-            this.textBoxBathTranslateSystemPrompt = new System.Windows.Forms.TextBox();
-            this.labelBathTranslateSystemPrompt = new System.Windows.Forms.Label();
+            this.textBoxBatchTranslateUserPrompt = new System.Windows.Forms.TextBox();
+            this.labelBatchTranslateUserPrompt = new System.Windows.Forms.Label();
+            this.textBoxBatchTranslateSystemPrompt = new System.Windows.Forms.TextBox();
+            this.labelBatchTranslateSystemPrompt = new System.Windows.Forms.Label();
             this.labelAction = new System.Windows.Forms.Label();
             this.groupBoxSingleTranslate = new System.Windows.Forms.GroupBox();
-            this.groupBoxBathTranslate = new System.Windows.Forms.GroupBox();
+            this.groupBoxBatchTranslate = new System.Windows.Forms.GroupBox();
+            this.labelName = new System.Windows.Forms.Label();
             this.groupBoxSingleTranslate.SuspendLayout();
-            this.groupBoxBathTranslate.SuspendLayout();
+            this.groupBoxBatchTranslate.SuspendLayout();
             this.SuspendLayout();
             // 
             // buttonCancel
@@ -175,47 +175,47 @@
             this.toolTip.IsBalloon = true;
             this.toolTip.ReshowDelay = 100;
             // 
-            // textBoxBathTranslateUserPrompt
+            // textBoxBatchTranslateUserPrompt
             // 
-            this.textBoxBathTranslateUserPrompt.AcceptsReturn = true;
-            this.textBoxBathTranslateUserPrompt.AcceptsTab = true;
-            this.textBoxBathTranslateUserPrompt.Location = new System.Drawing.Point(142, 139);
-            this.textBoxBathTranslateUserPrompt.Multiline = true;
-            this.textBoxBathTranslateUserPrompt.Name = "textBoxBathTranslateUserPrompt";
-            this.textBoxBathTranslateUserPrompt.Size = new System.Drawing.Size(362, 99);
-            this.textBoxBathTranslateUserPrompt.TabIndex = 14;
-            this.textBoxBathTranslateUserPrompt.WordWrap = false;
-            this.textBoxBathTranslateUserPrompt.TextChanged += new System.EventHandler(this.textBoxBathTranslateUserPrompt_TextChanged);
+            this.textBoxBatchTranslateUserPrompt.AcceptsReturn = true;
+            this.textBoxBatchTranslateUserPrompt.AcceptsTab = true;
+            this.textBoxBatchTranslateUserPrompt.Location = new System.Drawing.Point(142, 139);
+            this.textBoxBatchTranslateUserPrompt.Multiline = true;
+            this.textBoxBatchTranslateUserPrompt.Name = "textBoxBatchTranslateUserPrompt";
+            this.textBoxBatchTranslateUserPrompt.Size = new System.Drawing.Size(362, 99);
+            this.textBoxBatchTranslateUserPrompt.TabIndex = 14;
+            this.textBoxBatchTranslateUserPrompt.WordWrap = false;
+            this.textBoxBatchTranslateUserPrompt.TextChanged += new System.EventHandler(this.textBoxBatchTranslateUserPrompt_TextChanged);
             // 
-            // labelBathTranslateUserPrompt
+            // labelBatchTranslateUserPrompt
             // 
-            this.labelBathTranslateUserPrompt.Location = new System.Drawing.Point(7, 139);
-            this.labelBathTranslateUserPrompt.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
-            this.labelBathTranslateUserPrompt.Name = "labelBathTranslateUserPrompt";
-            this.labelBathTranslateUserPrompt.Size = new System.Drawing.Size(120, 18);
-            this.labelBathTranslateUserPrompt.TabIndex = 13;
-            this.labelBathTranslateUserPrompt.Text = "User Prompt^";
+            this.labelBatchTranslateUserPrompt.Location = new System.Drawing.Point(7, 139);
+            this.labelBatchTranslateUserPrompt.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.labelBatchTranslateUserPrompt.Name = "labelBatchTranslateUserPrompt";
+            this.labelBatchTranslateUserPrompt.Size = new System.Drawing.Size(120, 18);
+            this.labelBatchTranslateUserPrompt.TabIndex = 13;
+            this.labelBatchTranslateUserPrompt.Text = "User Prompt^";
             // 
-            // textBoxBathTranslateSystemPrompt
+            // textBoxBatchTranslateSystemPrompt
             // 
-            this.textBoxBathTranslateSystemPrompt.AcceptsReturn = true;
-            this.textBoxBathTranslateSystemPrompt.AcceptsTab = true;
-            this.textBoxBathTranslateSystemPrompt.Location = new System.Drawing.Point(142, 24);
-            this.textBoxBathTranslateSystemPrompt.Multiline = true;
-            this.textBoxBathTranslateSystemPrompt.Name = "textBoxBathTranslateSystemPrompt";
-            this.textBoxBathTranslateSystemPrompt.Size = new System.Drawing.Size(362, 99);
-            this.textBoxBathTranslateSystemPrompt.TabIndex = 12;
-            this.textBoxBathTranslateSystemPrompt.WordWrap = false;
-            this.textBoxBathTranslateSystemPrompt.TextChanged += new System.EventHandler(this.textBoxBathTranslateSystemPrompt_TextChanged);
+            this.textBoxBatchTranslateSystemPrompt.AcceptsReturn = true;
+            this.textBoxBatchTranslateSystemPrompt.AcceptsTab = true;
+            this.textBoxBatchTranslateSystemPrompt.Location = new System.Drawing.Point(142, 24);
+            this.textBoxBatchTranslateSystemPrompt.Multiline = true;
+            this.textBoxBatchTranslateSystemPrompt.Name = "textBoxBatchTranslateSystemPrompt";
+            this.textBoxBatchTranslateSystemPrompt.Size = new System.Drawing.Size(362, 99);
+            this.textBoxBatchTranslateSystemPrompt.TabIndex = 12;
+            this.textBoxBatchTranslateSystemPrompt.WordWrap = false;
+            this.textBoxBatchTranslateSystemPrompt.TextChanged += new System.EventHandler(this.textBoxBatchTranslateSystemPrompt_TextChanged);
             // 
-            // labelBathTranslateSystemPrompt
+            // labelBatchTranslateSystemPrompt
             // 
-            this.labelBathTranslateSystemPrompt.Location = new System.Drawing.Point(7, 24);
-            this.labelBathTranslateSystemPrompt.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
-            this.labelBathTranslateSystemPrompt.Name = "labelBathTranslateSystemPrompt";
-            this.labelBathTranslateSystemPrompt.Size = new System.Drawing.Size(120, 18);
-            this.labelBathTranslateSystemPrompt.TabIndex = 11;
-            this.labelBathTranslateSystemPrompt.Text = "System Prompt\r\n\r\n^";
+            this.labelBatchTranslateSystemPrompt.Location = new System.Drawing.Point(7, 24);
+            this.labelBatchTranslateSystemPrompt.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.labelBatchTranslateSystemPrompt.Name = "labelBatchTranslateSystemPrompt";
+            this.labelBatchTranslateSystemPrompt.Size = new System.Drawing.Size(120, 18);
+            this.labelBatchTranslateSystemPrompt.TabIndex = 11;
+            this.labelBatchTranslateSystemPrompt.Text = "System Prompt\r\n\r\n^";
             // 
             // labelAction
             // 
@@ -232,14 +232,27 @@
             this.groupBoxSingleTranslate.Controls.Add(this.labelSystemPrompt);
             this.groupBoxSingleTranslate.Controls.Add(this.labelUserPrompt);
             this.groupBoxSingleTranslate.Controls.Add(this.textBoxUserPrompt);
-            this.groupBoxSingleTranslate.Location = new System.Drawing.Point(10, 96);
+            this.groupBoxSingleTranslate.Location = new System.Drawing.Point(10, 141);
             this.groupBoxSingleTranslate.Name = "groupBoxSingleTranslate";
             this.groupBoxSingleTranslate.Size = new System.Drawing.Size(516, 253);
             this.groupBoxSingleTranslate.TabIndex = 45;
             this.groupBoxSingleTranslate.TabStop = false;
             this.groupBoxSingleTranslate.Text = "Use For Single Translate";
             // 
-            // groupBoxBathTranslate
+            // groupBoxBatchTranslate
+            // 
+            this.groupBoxBatchTranslate.Controls.Add(this.textBoxBatchTranslateSystemPrompt);
+            this.groupBoxBatchTranslate.Controls.Add(this.labelBatchTranslateSystemPrompt);
+            this.groupBoxBatchTranslate.Controls.Add(this.textBoxBatchTranslateUserPrompt);
+            this.groupBoxBatchTranslate.Controls.Add(this.labelBatchTranslateUserPrompt);
+            this.groupBoxBatchTranslate.Location = new System.Drawing.Point(10, 414);
+            this.groupBoxBatchTranslate.Name = "groupBoxBatchTranslate";
+            this.groupBoxBatchTranslate.Size = new System.Drawing.Size(516, 253);
+            this.groupBoxBatchTranslate.TabIndex = 33;
+            this.groupBoxBatchTranslate.TabStop = false;
+            this.groupBoxBatchTranslate.Text = "Use For Batch Translate";
+            // 
+            // labelName
             // 
             this.labelName.Location = new System.Drawing.Point(13, 100);
             this.labelName.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
@@ -278,8 +291,8 @@
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.PromptTemplateManage_FormClosing);
             this.groupBoxSingleTranslate.ResumeLayout(false);
             this.groupBoxSingleTranslate.PerformLayout();
-            this.groupBoxBathTranslate.ResumeLayout(false);
-            this.groupBoxBathTranslate.PerformLayout();
+            this.groupBoxBatchTranslate.ResumeLayout(false);
+            this.groupBoxBatchTranslate.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -298,10 +311,10 @@
         private System.Windows.Forms.Button buttonDelete;
         private System.Windows.Forms.TextBox textBoxName;
         private System.Windows.Forms.ToolTip toolTip;
-        private System.Windows.Forms.TextBox textBoxBathTranslateUserPrompt;
-        private System.Windows.Forms.Label labelBathTranslateUserPrompt;
-        private System.Windows.Forms.TextBox textBoxBathTranslateSystemPrompt;
-        private System.Windows.Forms.Label labelBathTranslateSystemPrompt;
+        private System.Windows.Forms.TextBox textBoxBatchTranslateUserPrompt;
+        private System.Windows.Forms.Label labelBatchTranslateUserPrompt;
+        private System.Windows.Forms.TextBox textBoxBatchTranslateSystemPrompt;
+        private System.Windows.Forms.Label labelBatchTranslateSystemPrompt;
         private System.Windows.Forms.Label labelAction;
         private System.Windows.Forms.GroupBox groupBoxSingleTranslate;
         private System.Windows.Forms.GroupBox groupBoxBatchTranslate;

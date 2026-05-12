@@ -95,7 +95,7 @@ namespace MultiSupplierMTPlugin.ProvidersCommon.Forms.LLM
             toolTip.SetToolTip(labelUserPrompt, LLH.G(LLKC.ToolTip_LLMPromptTip));
 
             labelOtherOptions.Text = LLH.G(LLK.LabelOtherOptions);
-            linkLabelBathTranslate.Text = LLH.G(LLK.LinkLabelBathTranslate);
+            linkLabelBatchTranslate.Text = LLH.G(LLK.LinkLabelBatchTranslate);
             linkLabelMoreSettings.Text = LLH.G(LLK.LabelMoreSettings);
 
             _textBoxPromptMenu = PromptHelper.CreateTextBoxContextMenu();
@@ -115,7 +115,7 @@ namespace MultiSupplierMTPlugin.ProvidersCommon.Forms.LLM
             LoadModels(_generalSettings.Model, _generalSettings.Model, _generalSettings.UserModels, _buildInModels, _generalSettings.HidenBuildInModels.ToHashSet());
             LoadPromptTemplates(_generalSettings.PromptTemplateId, _mtGeneralSettings.LLMCommon.PromptTemplates);
 
-            checkBoxBathTranslate.Checked = _generalSettings.EnableBathTranslate;
+            checkBoxBatchTranslate.Checked = _generalSettings.EnableBathTranslate;
 
             buttonListModels.Enabled = !string.IsNullOrEmpty(textBoxApiKey.Text);
 
@@ -363,7 +363,7 @@ namespace MultiSupplierMTPlugin.ProvidersCommon.Forms.LLM
                 textBoxSystemPrompt.ContextMenuStrip = noUse ? _textBoxPromptMenu : null;
                 textBoxUserPrompt.ContextMenuStrip = noUse ? _textBoxPromptMenu : null;
 
-                ChangeTextBoxPrompt(checkBoxBathTranslate.Checked, promptTemplate);
+                ChangeTextBoxPrompt(checkBoxBatchTranslate.Checked, promptTemplate);
             }
         }
 
@@ -371,7 +371,7 @@ namespace MultiSupplierMTPlugin.ProvidersCommon.Forms.LLM
         {
             if (comboBoxPromptTemplate.SelectedItem is PromptTemplate promptTemplate)
             {
-                if (checkBoxBathTranslate.Checked)
+                if (checkBoxBatchTranslate.Checked)
                     promptTemplate.BathTranslateSystemPrompt = textBoxSystemPrompt.Text;
                 else
                     promptTemplate.SystemPrompt = textBoxSystemPrompt.Text;
@@ -384,7 +384,7 @@ namespace MultiSupplierMTPlugin.ProvidersCommon.Forms.LLM
         {
             if (comboBoxPromptTemplate.SelectedItem is PromptTemplate promptTemplate)
             {
-                if (checkBoxBathTranslate.Checked)
+                if (checkBoxBatchTranslate.Checked)
                     promptTemplate.BathTranslateUserPrompt = textBoxUserPrompt.Text;
                 else
                     promptTemplate.UserPrompt = textBoxUserPrompt.Text;
@@ -393,11 +393,11 @@ namespace MultiSupplierMTPlugin.ProvidersCommon.Forms.LLM
             }
         }
 
-        private void checkBoxBathTranslate_CheckedChanged(object sender, EventArgs e)
+        private void checkBoxBatchTranslate_CheckedChanged(object sender, EventArgs e)
         {
             if (comboBoxPromptTemplate.SelectedItem is PromptTemplate promptTemplate)
             {
-                ChangeTextBoxPrompt(checkBoxBathTranslate.Checked, promptTemplate);
+                ChangeTextBoxPrompt(checkBoxBatchTranslate.Checked, promptTemplate);
             }
         }
 
@@ -427,9 +427,9 @@ namespace MultiSupplierMTPlugin.ProvidersCommon.Forms.LLM
             }
         }
 
-        private void linkLabelBathTranslate_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+        private void linkLabelBatchTranslate_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
         {
-            using (var form = new BathTranslate(_mtGeneralSettings, _mtSecureSettings, _generalSettings))
+            using (var form = new BatchTranslate(_mtGeneralSettings, _mtSecureSettings, _generalSettings))
             {
                 form.ShowDialog();
             }
@@ -483,7 +483,7 @@ namespace MultiSupplierMTPlugin.ProvidersCommon.Forms.LLM
                 _generalSettings.BathTranslateSystemPrompt = _promptTemplates[0].BathTranslateSystemPrompt;
                 _generalSettings.BathTranslateUserPrompt = _promptTemplates[0].BathTranslateUserPrompt;
 
-                _generalSettings.EnableBathTranslate = checkBoxBathTranslate.Checked;
+                _generalSettings.EnableBathTranslate = checkBoxBatchTranslate.Checked;
 
                 _generalSettings.Checked = true;
             }
@@ -548,13 +548,13 @@ namespace MultiSupplierMTPlugin.ProvidersCommon.Forms.LLM
         [LocalizedValue("b530929e-dca0-444c-9e8c-7d9f1dd3bac7", "Other Options", "其他选项")]
         public static OptionsFormLocalizedKey LabelOtherOptions { get; private set; }
 
-        [LocalizedValue("6836599e-966f-45d9-8d5a-25285b05450e", "Bath Translate", "批量翻译")]
-        public static OptionsFormLocalizedKey LinkLabelBathTranslate { get; private set; }
+        [LocalizedValue("6836599e-966f-45d9-8d5a-25285b05450e", "Batch Translate", "批量翻译")]
+        public static OptionsFormLocalizedKey LinkLabelBatchTranslate { get; private set; }
 
         [LocalizedValue("957c00f3-efef-420e-a129-719a141ff6f3", "More Settings", "更多设置")]
         public static OptionsFormLocalizedKey LabelMoreSettings { get; private set; }
 
-        [LocalizedValue("44b68ad2-9c88-4b9c-b1ea-f5d581713f8c", "[Custom Model List]", "【自定义模型列表】")]
+        [LocalizedValue("44b68ad2-9c88-4b9c-b1ea-f5d581713f8c", "[Click here customize model list]", "【点此自定义模型列表】")]
         public static OptionsFormLocalizedKey CustomModelList { get; private set; }
 
         [LocalizedValue("b77452d6-c194-4d1b-b13a-686c5656c638", "Default", "内置默认")]

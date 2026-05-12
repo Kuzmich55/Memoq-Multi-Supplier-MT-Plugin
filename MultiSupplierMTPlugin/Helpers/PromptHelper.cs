@@ -157,7 +157,7 @@ namespace MultiSupplierMTPlugin.Helpers
             if (promptBuilder.HasPlaceholder(_SOURCE_TEXT_KEY))
             {
                 var sourceText = bSettings.EnableBathTranslate
-                        ? BathTranslateHelper.Serialize(bSettings.BathTranslateSchema, texts)
+                        ? BatchTranslateHelper.Serialize(bSettings.BathTranslateSchema, texts)
                         : texts[0];
 
                 promptBuilder.SetPlaceholder(_SOURCE_TEXT_KEY, sourceText);

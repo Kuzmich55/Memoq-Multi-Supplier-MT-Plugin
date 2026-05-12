@@ -55,11 +55,10 @@ namespace MultiSupplierMTPlugin.ProvidersCommon.Forms.LLM
             this.labelPromptTemplate = new System.Windows.Forms.Label();
             this.comboBoxPromptTemplate = new System.Windows.Forms.ComboBox();
             this.buttonManage = new System.Windows.Forms.Button();
-            this.checkBoxBathTranslate = new System.Windows.Forms.CheckBox();
+            this.checkBoxBatchTranslate = new System.Windows.Forms.CheckBox();
             this.labelOrganization = new System.Windows.Forms.Label();
-            this.linkLabelBathTranslate = new System.Windows.Forms.LinkLabel();
+            this.linkLabelBatchTranslate = new System.Windows.Forms.LinkLabel();
             this.labelOtherOptions = new System.Windows.Forms.Label();
-            this.commonBottomControl = new MultiSupplierMTPlugin.ProviderdsCommon.Forms.CommonBottomControl();
             this.toolTip = new System.Windows.Forms.ToolTip(this.components);
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDownTemperature)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDownMaxTokens)).BeginInit();
@@ -313,14 +312,14 @@ namespace MultiSupplierMTPlugin.ProvidersCommon.Forms.LLM
             this.buttonManage.UseVisualStyleBackColor = true;
             this.buttonManage.Click += new System.EventHandler(this.buttonManage_Click);
             // 
-            // checkBoxBathTranslate
+            // checkBoxBatchTranslate
             // 
-            this.checkBoxBathTranslate.AutoSize = true;
-            this.checkBoxBathTranslate.Location = new System.Drawing.Point(149, 524);
-            this.checkBoxBathTranslate.Name = "checkBoxBathTranslate";
-            this.checkBoxBathTranslate.Size = new System.Drawing.Size(18, 17);
-            this.checkBoxBathTranslate.TabIndex = 23;
-            this.checkBoxBathTranslate.CheckedChanged += new System.EventHandler(this.checkBoxBathTranslate_CheckedChanged);
+            this.checkBoxBatchTranslate.AutoSize = true;
+            this.checkBoxBatchTranslate.Location = new System.Drawing.Point(149, 524);
+            this.checkBoxBatchTranslate.Name = "checkBoxBatchTranslate";
+            this.checkBoxBatchTranslate.Size = new System.Drawing.Size(18, 17);
+            this.checkBoxBatchTranslate.TabIndex = 23;
+            this.checkBoxBatchTranslate.CheckedChanged += new System.EventHandler(this.checkBoxBatchTranslate_CheckedChanged);
             // 
             // labelOrganization
             // 
@@ -331,17 +330,17 @@ namespace MultiSupplierMTPlugin.ProvidersCommon.Forms.LLM
             this.labelOrganization.TabIndex = 8;
             this.labelOrganization.Text = "Organization";
             // 
-            // linkLabelBathTranslate
+            // linkLabelBatchTranslate
             // 
-            this.linkLabelBathTranslate.AutoSize = true;
-            this.linkLabelBathTranslate.LinkBehavior = System.Windows.Forms.LinkBehavior.NeverUnderline;
-            this.linkLabelBathTranslate.Location = new System.Drawing.Point(171, 525);
-            this.linkLabelBathTranslate.Name = "linkLabelBathTranslate";
-            this.linkLabelBathTranslate.Size = new System.Drawing.Size(119, 15);
-            this.linkLabelBathTranslate.TabIndex = 24;
-            this.linkLabelBathTranslate.TabStop = true;
-            this.linkLabelBathTranslate.Text = "Bath Translate";
-            this.linkLabelBathTranslate.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.linkLabelBathTranslate_LinkClicked);
+            this.linkLabelBatchTranslate.AutoSize = true;
+            this.linkLabelBatchTranslate.LinkBehavior = System.Windows.Forms.LinkBehavior.NeverUnderline;
+            this.linkLabelBatchTranslate.Location = new System.Drawing.Point(171, 525);
+            this.linkLabelBatchTranslate.Name = "linkLabelBatchTranslate";
+            this.linkLabelBatchTranslate.Size = new System.Drawing.Size(127, 15);
+            this.linkLabelBatchTranslate.TabIndex = 24;
+            this.linkLabelBatchTranslate.TabStop = true;
+            this.linkLabelBatchTranslate.Text = "Batch Translate";
+            this.linkLabelBatchTranslate.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.linkLabelBatchTranslate_LinkClicked);
             // 
             // labelOtherOptions
             // 
@@ -375,10 +374,10 @@ namespace MultiSupplierMTPlugin.ProvidersCommon.Forms.LLM
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(540, 639);
             this.Controls.Add(this.labelOtherOptions);
-            this.Controls.Add(this.linkLabelBathTranslate);
+            this.Controls.Add(this.linkLabelBatchTranslate);
             this.Controls.Add(this.commonBottomControl);
             this.Controls.Add(this.labelOrganization);
-            this.Controls.Add(this.checkBoxBathTranslate);
+            this.Controls.Add(this.checkBoxBatchTranslate);
             this.Controls.Add(this.buttonManage);
             this.Controls.Add(this.comboBoxPromptTemplate);
             this.Controls.Add(this.labelPromptTemplate);
@@ -442,10 +441,10 @@ namespace MultiSupplierMTPlugin.ProvidersCommon.Forms.LLM
         private System.Windows.Forms.Label labelPromptTemplate;
         private System.Windows.Forms.ComboBox comboBoxPromptTemplate;
         private System.Windows.Forms.Button buttonManage;
-        private System.Windows.Forms.CheckBox checkBoxBathTranslate;
+        private System.Windows.Forms.CheckBox checkBoxBatchTranslate;
         private System.Windows.Forms.Label labelOrganization;
         private CommonBottomControl commonBottomControl;
-        private System.Windows.Forms.LinkLabel linkLabelBathTranslate;
+        private System.Windows.Forms.LinkLabel linkLabelBatchTranslate;
         private System.Windows.Forms.Label labelOtherOptions;
         private System.Windows.Forms.ToolTip toolTip;
     }

@@ -1,6 +1,6 @@
 ﻿namespace MultiSupplierMTPlugin.ProvidersCommon.Forms.LLM
 {
-    partial class BathTranslate
+    partial class BatchTranslate
     {
         /// <summary>
         /// Required designer variable.
@@ -277,7 +277,7 @@
             this.toolTip.InitialDelay = 100;
             this.toolTip.ReshowDelay = 100;
             // 
-            // BathTranslate
+            // BatchTranslate
             // 
             this.AcceptButton = this.buttonOK;
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 15F);
@@ -293,12 +293,12 @@
             this.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             this.MaximizeBox = false;
             this.MinimizeBox = false;
-            this.Name = "BathTranslate";
+            this.Name = "BatchTranslate";
             this.ShowIcon = false;
             this.ShowInTaskbar = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
-            this.Text = "Bath Translate (For use only by this provider)";
-            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.BathTranslate_FormClosing);
+            this.Text = "Batch Translate (For use only by this provider)";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.BatchTranslate_FormClosing);
             this.groupBoxOutputSchema.ResumeLayout(false);
             this.groupBoxOutputSchema.PerformLayout();
             this.groupBoxOutputFormat.ResumeLayout(false);
