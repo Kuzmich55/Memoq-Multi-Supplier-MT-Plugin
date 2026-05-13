@@ -7,6 +7,7 @@ namespace MultiSupplierMTPlugin.ProvidersCommon.Options.LLM
         public string GlossaryDelimiter { get; set; } = ",";
         public string GlossaryFilePath { get; set; } = string.Empty;
 
+        public string BatchTranslateResponseFormatPrompt { get; set; } =
         public bool SummaryAutoGenerate { get; set; } = false;
         public string SummaryFilePath { get; set; } = string.Empty;
         public string SummaryGeneratePrompt { get; set; } =

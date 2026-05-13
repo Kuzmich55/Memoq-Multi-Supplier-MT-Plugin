@@ -119,6 +119,16 @@ namespace MultiSupplierMTPlugin.Helpers
             var cSettings = mtOptions.GeneralSettings.LLMCommon;
             var bSettings = providerOptions.GeneralSettings as LLMBaseGeneralSettings;
 
+            // 新用户根本不会将占位符插入到提示词, 这是临时补丁，下一个版本再对其改进
+            if (bSettings.EnableBathTranslate && userPrompt.IndexOf("json", StringComparison.OrdinalIgnoreCase) < 0)
+            {
+                userPrompt = $"{cSettings.BatchTranslateResponseFormatPrompt}\r\n\r\n{userPrompt}";
+            }
+            if (!string.IsNullOrWhiteSpace(cSettings.GlossaryFilePath) && !userPrompt.Contains($"{{{{{_GLOSSARY_TEXT_KEY}}}}}"))
+            {
+                userPrompt = $"[Glossary for reference:\r\n]{{{{glossary-text}}}}[\r\n\r\n]{userPrompt}";
+            }
+
             var promptBuilder = new PromptBuilder(systemPrompt, userPrompt, _KNOWN_PLACEHOLDER_NAMES);
 
             // 术语表
