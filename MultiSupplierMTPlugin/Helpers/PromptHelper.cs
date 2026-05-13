@@ -46,10 +46,6 @@ namespace MultiSupplierMTPlugin.Helpers
             _ABOVE_TEXT_KEY, _BELOW_TEXT_KEY
         };
 
-
-        [DllImport("user32.dll", CharSet = CharSet.Auto)]
-        private static extern IntPtr SendMessage(IntPtr hWnd, int msg, IntPtr wParam, string lParam);
-
         public static ContextMenuStrip CreateTextBoxContextMenu()
         {
             var menu = new ContextMenuStrip();
@@ -69,8 +65,7 @@ namespace MultiSupplierMTPlugin.Helpers
                 Add(label, tb =>
                 {
                     if (!tb.Focused) tb.Focus();
-                    int EM_REPLACESEL = 0x00C2;
-                    SendMessage(tb.Handle, EM_REPLACESEL, (IntPtr)1, text);
+                    tb.SelectedText = text;
                 });
 
             void AddSeparator() => menu.Items.Add(new ToolStripSeparator());
