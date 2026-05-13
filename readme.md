@@ -237,7 +237,13 @@
 
 ### 8.6 {{glossary-text}}
 
-将术语储存为 UTF-8 编码的 CSV 或 TXT 文件，默认的列名和顺序如下：
+术语文件支持 memoQ 导出的多语言列 CSV 格式，以及 DeepL 扁平 CSV 格式。
+
+从 memoQ 导出时必须包含表头，插件检测到表头包含两种以上的 memoQ 语言列时判定为 memoQ 格式，否则为 DeepL 格式。
+
+
+
+DeepL 格式使用的语言代码为 memoQ 的[ 3 字母代码](https://docs.memoq.com/current/en/Concepts/concepts-supported-languages.html)，默认的列名和顺序如下：
 
 ```csv
 SourceTerm, TargetTerm, SourceLanguage, TargetLanguage
@@ -245,11 +251,7 @@ Hello     , 你好       , eng           , zho-CN
 World     , 世界       , eng           , zho-CN
 ```
 
-默认的分隔符为“英文半角逗号”，语言代码使用的是 memoQ 指定的[ 3 字母代码](https://docs.memoq.com/current/en/Concepts/concepts-supported-languages.html)。
-
-
-
-术语文件解析算法足够灵活，如果与默认结构不同，只要满足以下约定，应该都能正确解析：
+解析算法足够灵活，如果与默认结构不同，只要满足以下约定，应该都能正确解析：
 
 - 表头：如果列的顺序和默认顺序一致，第一行表头可选，否则必须包含表头，由表头指出正确的列顺序。
 - 列数：至少包含 `SourceTerm` 和 `TargetTerm` 列，可选包含 `SourceLanguage` 和 `TargetLanguage` 列。
@@ -258,15 +260,7 @@ World     , 世界       , eng           , zho-CN
 
 
 
-语言列的作用是限制术语条目的获取，比如一个术语文件中有多种语言的术语对，如果没有语言列，最终结果中将包含所有语言的术语对。
-
-**插件 v1.4.1 实现了”智能术语表“功能，请求中只会携带当前句段包含的术语，而不像之前携带全部的术语，因此你的术语表可以非常的大。**
-
 当术语文件读取失败或任一行数据解析出错，插件将终止该次翻译以防止产生非预期翻译结果，你可以在日志中查看错误信息并修正错误。
-
-
-
-注：memoQ 在中文环境下会自动将输入法设为全角状态，如果要修改分隔符且术语文件使用的分隔符不是全角，请先手动调回半角状态。
 
 ### 8.7 占位符的特殊语法说明
 

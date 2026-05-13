@@ -226,7 +226,13 @@ Use the `{{full-text}}` placeholder cautiously, typically only in prompts for au
 
 ### 8.6 {{glossary-text}}
 
-Store terms in a CSV or TXT file with UTF-8 encoding. The default column names and order are:
+Term files support the multi-language column CSV format exported by memoQ, as well as the DeepL flat CSV format.
+
+When exporting from memoQ, the header must be included. If the plugin detects that the header contains two or more memoQ language columns, it will be identified as the memoQ format; otherwise, it will be treated as the DeepL format.
+
+
+
+The DeepL format uses memoQ’s [3-letter language codes](https://docs.memoq.com/current/en/Concepts/concepts-supported-languages.html). The default column names and order are as follows:
 
 ```csv
 SourceTerm, TargetTerm, SourceLanguage, TargetLanguage
@@ -234,22 +240,16 @@ Hello     , 你好       , eng           , zho-CN
 World     , 世界       , eng           , zho-CN
 ```
 
-The default delimiter is a "comma". Language codes use the [3-letter codes](https://docs.memoq.com/current/en/Concepts/concepts-supported-languages.html) specified by memoQ.
-
-The terminology file parsing algorithm is flexible enough. If the structure differs from the default, it should parse correctly as long as the following conventions are met:
+Parsing algorithm is flexible enough. If the structure differs from the default, it should parse correctly as long as the following conventions are met:
 
 - Header: If the column order matches the default order, the first header row is optional. Otherwise, it must contain a header row specifying the correct column order.
 - Columns: Must include at least `SourceTerm` and `TargetTerm` columns. Optionally can include `SourceLanguage` and `TargetLanguage` columns.
 - Conflict: If a header is present and does not list the language columns, but the data rows contain language columns, the language columns in the data rows will be ignored.
 - Spacing: Adding spaces for delimiter alignment is not necessary. Spacing in the example is for aesthetics only and does not affect parsing.
 
-The purpose of the language columns is to restrict the retrieval of term entries. For example, if a terminology file contains term pairs for multiple languages, without the language columns, the final result would include all language pairs.
 
-**Plugin v1.4.1 implements an "Intelligent Glossary" feature. Requests now only carry terms contained within the current segment, unlike before which carried all terms, allowing your glossary to be very large.**
 
 If the terminology file fails to read or any row data parsing fails, the plugin will abort the translation to prevent unexpected results. You can check the error information in the logs and correct the errors.
-
-Note: memoQ automatically sets the input method to full-width mode in Chinese environments. If you need to change the delimiter and the terminology file uses a non-full-width delimiter, first manually switch back to half-width mode.
 
 ### 8.7 Special Syntax for Placeholders
 
