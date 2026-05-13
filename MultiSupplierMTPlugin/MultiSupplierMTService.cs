@@ -247,7 +247,7 @@ namespace MultiSupplierMTPlugin
             }
             else
             {
-                var template = g.PromptTemplateId == "Default"
+                var template = g.PromptTemplateId == PromptTemplate.DefaultId
                     ? PromptTemplate.GetDefault()
                     : _mtGeneralSettings.LLMCommon.PromptTemplates.FirstOrDefault(p => p.ID == g.PromptTemplateId);
 
@@ -258,7 +258,7 @@ namespace MultiSupplierMTPlugin
                 userPrompt = g.EnableBathTranslate ? template.BathTranslateUserPrompt : template.UserPrompt;
             }
 
-            // 4.解析提示词占位符 (TODO 摘要生成自定义一个方法，而不是共用翻译方法，否则参数太长了)
+            // 4.解析提示词占位符 (TODO 摘要生成自定义一个方法，而不是共用翻译方法，否则参数太长了) TODO 这里传入 _options 是错误的
             (systemPrompt, userPrompt) = PromptHelper.Parse(
                 systemPrompt, userPrompt,
                 _mtOptions, _options, SupportLangDic, this,

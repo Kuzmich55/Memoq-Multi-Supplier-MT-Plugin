@@ -7,7 +7,6 @@ using System.Linq;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
-using LLMSupportLang = MultiSupplierMTPlugin.ProvidersCommon.SupportLanguages.LLM;
 
 namespace MultiSupplierMTPlugin.Providers.OpenAI
 {
@@ -78,7 +77,7 @@ namespace MultiSupplierMTPlugin.Providers.OpenAI
 
         public override string ModelsLink { get; set; } = "https://platform.openai.com/docs/models";
 
-        public override Dictionary<string, string> SupportLangDic { get; set; } = LLMSupportLang.Dic;
+        public override Dictionary<string, string> SupportLangDic { get; set; } = LanguageHelper.CodeToFriendlyNameDic;
 
         public override ModelItem[] BuildInModels { get; set; } = new string[]
         {
@@ -164,7 +163,7 @@ namespace MultiSupplierMTPlugin.Providers.OpenAI
                 MaxCompletionTokens = null,
                 Temperature = g.Temperature,
             };
-
+            
             if (g.UseMaxCompletionTokensInsteadMaxTokens)
             {
                 chatCompletionRequest.MaxTokens = null;
@@ -177,11 +176,11 @@ namespace MultiSupplierMTPlugin.Providers.OpenAI
                 var responseFormat = new ResponseFormat();
                 switch (g.BathTranslateResponseFormat)
                 {
-                    case BathTranslateResponseFormat.JSON_Schema:
+                    case BatchTranslateResponseFormat.JSON_Schema:
                         responseFormat.Type = "json_schema";
-                        responseFormat.JsonSchema = BathTranslateHelper.GetJsonScheme(g.BathTranslateSchema);
+                        responseFormat.JsonSchema = BatchTranslateHelper.GetJsonScheme(g.BathTranslateSchema);
                         break;
-                    case BathTranslateResponseFormat.JSON_Object:
+                    case BatchTranslateResponseFormat.JSON_Object:
                         responseFormat.Type = "json_object";
                         break;
                     default:

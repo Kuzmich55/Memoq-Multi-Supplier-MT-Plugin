@@ -8,6 +8,8 @@ namespace MultiSupplierMTPlugin.ProvidersCommon.Options.LLM
         public string GlossaryFilePath { get; set; } = string.Empty;
 
         public string BatchTranslateResponseFormatPrompt { get; set; } =
+            "Respond a valid JSON object with the same keys and the result as values.";
+
         public bool SummaryAutoGenerate { get; set; } = false;
         public string SummaryFilePath { get; set; } = string.Empty;
         public string SummaryGeneratePrompt { get; set; } =
@@ -40,6 +42,8 @@ namespace MultiSupplierMTPlugin.ProvidersCommon.Options.LLM
 
     class PromptTemplate
     {
+        public static readonly string DefaultId = "Default";
+
         public string ID { get; set; } = string.Empty; // 不能变更的唯一 ID，
 
         public string Name { get; set; } = string.Empty; // 用户设定的名字        
@@ -71,7 +75,7 @@ namespace MultiSupplierMTPlugin.ProvidersCommon.Options.LLM
         {
             return new PromptTemplate()
             {
-                ID = "Default",
+                ID = DefaultId,
 
                 Name = name ?? "Default",
 

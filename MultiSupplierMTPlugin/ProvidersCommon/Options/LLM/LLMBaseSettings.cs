@@ -17,7 +17,7 @@
 
         public virtual bool PromptCache { get; set; } = false;
 
-        public virtual string PromptTemplateId { get; set; } = "Default";
+        public virtual string PromptTemplateId { get; set; } = PromptTemplate.DefaultId;
         public virtual string SystemPrompt { get; set; } = string.Empty;
         public virtual string UserPrompt { get; set; } = string.Empty;
         public virtual string BathTranslateSystemPrompt { get; set; } = string.Empty;

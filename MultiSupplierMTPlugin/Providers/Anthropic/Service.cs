@@ -7,7 +7,6 @@ using System.Linq;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
-using LLMSupportLang = MultiSupplierMTPlugin.ProvidersCommon.SupportLanguages.LLM;
 
 namespace MultiSupplierMTPlugin.Providers.Anthropic
 {
@@ -99,7 +98,7 @@ namespace MultiSupplierMTPlugin.Providers.Anthropic
             "claude-3-7-sonnet-latest" //推荐
         }.Select(name => new ModelItem() { UniqueName = name, DisplayName = name }).ToArray();
 
-        public override Dictionary<string, string> SupportLangDic { get; set; } = LLMSupportLang.Dic;
+        public override Dictionary<string, string> SupportLangDic { get; set; } = LanguageHelper.CodeToFriendlyNameDic;
 
         public override ProviderOptions ShowConfig()
         {

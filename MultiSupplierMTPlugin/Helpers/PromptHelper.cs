@@ -72,8 +72,8 @@ namespace MultiSupplierMTPlugin.Helpers
 
             string Build(string name, bool noEmpty)
             {
-                var no = noEmpty ? "!" : "";
-                return "{{" + name + no + "}}";
+                var noEmptyChar = noEmpty ? "!" : "";
+                return "{{" + name + noEmptyChar + "}}";
             }
 
             Insert(LLH.G(LLKC.TextBoxPromptMenu_SourceLanguage), Build(_SOURCE_LANGUAGE_KEY, true));
